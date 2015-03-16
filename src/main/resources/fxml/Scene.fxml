@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<SplitPane dividerPositions="0.4882943143812709" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+  <items>
+      <TreeView fx:id="panelTree" layoutY="6.0" prefHeight="398.0" prefWidth="338.0" SplitPane.resizableWithParent="false" />
+      <StackPane layoutX="51.0" layoutY="99.0" style="-fx-background-color: #ccc;">
+         <children>
+            <VBox fx:id="panelConnect" alignment="CENTER" fillWidth="false" layoutX="51.0" layoutY="99.0" maxHeight="245.0" maxWidth="270.0" prefHeight="245.0" prefWidth="270.0" spacing="10.0" style="-fx-background-color: #f3f3f3;" StackPane.alignment="CENTER">
+               <effect>
+                  <DropShadow blurType="TWO_PASS_BOX" color="#00000080" height="16.0" offsetY="2.0" radius="7.5" width="16.0" />
+               </effect>
+               <children>
+                  <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="29.0" prefWidth="341.0" text="Connect to your DBMS" textAlignment="CENTER" textFill="#4164a1">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                     <padding>
+                        <Insets left="4.0" right="4.0" />
+                     </padding>
+                     <font>
+                        <Font name="Arial Bold" size="18.0" />
+                     </font>
+                  </Label>
+                  <ChoiceBox fx:id="fieldDatabaseType" prefHeight="25.0" prefWidth="352.0" />
+                  <HBox spacing="16.0">
+                     <children>
+                        <TextField fx:id="fieldHost" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="168.0" promptText="Host" />
+                        <TextField fx:id="fieldPort" layoutX="10.0" layoutY="10.0" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="54.0" promptText="Port" />
+                     </children>
+                  </HBox>
+                  <TextField fx:id="fieldUsername" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="314.0" promptText="Username" />
+                  <PasswordField fx:id="fieldPassword" prefHeight="25.0" prefWidth="300.0" promptText="Password" />
+                  <TextField fx:id="fieldDatabaseName" prefHeight="25.0" prefWidth="405.0" promptText="Database Name" />
+                  <Button fx:id="buttonConnect" defaultButton="true" mnemonicParsing="false" text="Connect!">
+                     <padding>
+                        <Insets bottom="8.0" left="16.0" right="16.0" top="8.0" />
+                     </padding>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+               </padding>
+            </VBox>
+         </children>
+      </StackPane>
+  </items>
+</SplitPane>
