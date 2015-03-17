@@ -29,16 +29,14 @@ import javafx.stage.Stage;
 public class MainApp extends Application {
     
 //    private final static String PATH = "/com/speedment/orm/gui";
-    private final static String PATH = "";
     
     @Override
     public void start(Stage stage) throws Exception {
-        final FXMLLoader loader = new FXMLLoader(getClass().getResource(PATH + "/fxml/Scene.fxml"));
+        final FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Scene.fxml"));
         final SceneController control = new SceneController();
 		loader.setController(control);
 		
-		final SplitPane root;
-		root = (SplitPane) loader.load();
+		final SplitPane root = (SplitPane) loader.load();
 		final Scene scene = new Scene(root);
 
 		stage.setTitle("Speedment ORM");
