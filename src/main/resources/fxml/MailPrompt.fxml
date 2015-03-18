@@ -7,10 +7,9 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-
-<VBox alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="228.0" prefWidth="414.0" spacing="16.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<VBox alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="310.0" prefWidth="540.0" spacing="20.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label fx:id="labelHeader" alignment="CENTER" maxWidth="1.7976931348623157E308" text="Welcome to the community!">
+      <Label fx:id="labelHeader" alignment="CENTER" maxWidth="1.7976931348623157E308" text="Welcome to the community!" textFill="#3f6291">
          <font>
             <Font name="Arial Bold" size="24.0" />
          </font>
@@ -28,6 +27,6 @@
       </Button>
    </children>
    <padding>
-      <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+      <Insets bottom="48.0" left="48.0" right="48.0" top="48.0" />
    </padding>
 </VBox>

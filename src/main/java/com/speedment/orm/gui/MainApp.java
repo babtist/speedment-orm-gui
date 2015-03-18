@@ -16,10 +16,11 @@
  */
 package com.speedment.orm.gui;
 
+import com.speedment.orm.gui.controllers.MailPromptController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.SplitPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
@@ -27,20 +28,17 @@ import javafx.stage.Stage;
  * @author Emil Forslund
  */
 public class MainApp extends Application {
-    
-//    private final static String PATH = "/com/speedment/orm/gui";
-    
+
     @Override
     public void start(Stage stage) throws Exception {
-        final FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Scene.fxml"));
-        final SceneController control = new SceneController();
+        final FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MailPrompt.fxml"));
+        final MailPromptController control = new MailPromptController(stage);
 		loader.setController(control);
 		
-		final SplitPane root = (SplitPane) loader.load();
+		final VBox root = (VBox) loader.load();
 		final Scene scene = new Scene(root);
 
-		stage.setTitle("Speedment ORM");
-		stage.setMaximized(true);
+		stage.setTitle("Please enter your email");
 		stage.setScene(scene);
 		stage.show();
     }
@@ -51,5 +49,4 @@ public class MainApp extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-    
 }
