@@ -1,3 +1,19 @@
+/**
+ *
+ * Copyright (c) 2006-2015, Speedment, Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); You may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at:
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.speedment.orm.gui.controllers;
 
 import com.speedment.orm.config.model.Column;
@@ -5,7 +21,6 @@ import com.speedment.orm.config.model.Dbms;
 import com.speedment.orm.config.model.Project;
 import com.speedment.orm.config.model.Schema;
 import com.speedment.orm.config.model.Table;
-import com.speedment.orm.config.model.parameters.FieldStorageType;
 import com.speedment.orm.config.model.parameters.StandardDbmsType;
 import java.io.IOException;
 import java.net.URL;
@@ -53,6 +68,7 @@ public class ProjectPromptController implements Initializable {
 	 */
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
+        
 		fieldType.setItems(
 			Stream.of(StandardDbmsType.values())
 				.map(s -> s.getName())
@@ -83,7 +99,7 @@ public class ProjectPromptController implements Initializable {
 		
 		buttonConnect.setOnAction(ev -> {
 			Project project = Project.newProject();
-			project.setName("Hello Speedment");
+			project.setName("HelloSpeedment");
 			project.setPacketName("org.speedment.test");
 			
 			Dbms dbms = Dbms.newDbms();

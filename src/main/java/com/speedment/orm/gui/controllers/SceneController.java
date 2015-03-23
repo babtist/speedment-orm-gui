@@ -71,8 +71,8 @@ public class SceneController implements Initializable {
 	@FXML private Menu menuHelp;
 	@FXML private MenuItem mbGitHub;
 	@FXML private MenuItem mbAbout;
-	@FXML private TableColumn settingsColumnKey;
-	@FXML private TableColumn settingsColumnValue;
+	@FXML private TableColumn<Setting, String> settingsColumnKey;
+	@FXML private TableColumn<Setting, String> settingsColumnValue;
 	
 	private final Project project;
 	
