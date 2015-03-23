@@ -19,6 +19,7 @@ package com.speedment.orm.gui.controllers;
 import com.speedment.orm.config.model.Column;
 import com.speedment.orm.config.model.Project;
 import com.speedment.orm.config.model.aspects.Child;
+import com.speedment.orm.config.model.aspects.Enableable;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
@@ -43,7 +44,6 @@ import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.ImageView;
-import javafx.util.StringConverter;
 
 /**
  * FXML Controller class
@@ -98,61 +98,13 @@ public class SceneController implements Initializable {
 			new PropertyValueFactory<>("value")
 		);
 		settingsColumnValue.setCellFactory(TextFieldTableCell.<Setting>forTableColumn());
-		
-		//Platform.get().get(DbmsComponent.class).
-
-		// Load database types from Speedment.
-//		fieldDatabaseType.setItems(Stream.of(StandardDbmsType.values())
-//				.map(s -> s.getName())
-//				.collect(Collectors.toCollection(FXCollections::observableArrayList)));
-
-		// When the database type changes, other fields should be entered automatically.
-//		fieldDatabaseType.getSelectionModel().selectedItemProperty().addListener((observable, old, next) -> {
-//			System.out.println("Selecting");
-//			if (!observable.getValue().isEmpty()) {
-//				System.out.println("Observable: '" + observable + "', Old: '" + old + "', New: '" + next + "'.");
-//				final StandardDbmsType item = StandardDbmsType.valueOf(next.toUpperCase());
-//
-//				if (fieldHost.textProperty().getValue().isEmpty()) {
-//					System.out.println("Setting host.");
-//					fieldHost.textProperty().setValue("127.0.0.1");
-//				}
-//
-//				System.out.println("Setting port.");
-//				fieldPort.textProperty().setValue("" + item.getDefaultPort());
-//			}
-//		});
-
-		// When the user click on "Connect"
-//		buttonConnect.setOnAction(l -> {
-//			System.out.println("Attempting to connect...");
-//			fadeOut(panelConnect, e -> rightPanel.getChildren().remove(panelConnect));
-//
-//			final Dbms dbms = Dbms.newDbms();
-//			dbms.setIpAddress(fieldHost.textProperty().getValue());
-//			dbms.setPort(Integer.parseInt(fieldPort.textProperty().getValue()));
-//			dbms.setUsername(fieldUsername.textProperty().getValue());
-//			dbms.setPassword(fieldPassword.textProperty().getValue());
-//			dbms.setName(fieldDatabaseName.textProperty().getValue());
-//			dbms.setType(StandardDbmsType.valueOf(fieldDatabaseType.getValue().toUpperCase()));
-//
-//			dbms.addNewSchema().setName("Schema 1");
-//			dbms.addNewSchema().setName("Schema 2");
-//			dbms.addNewSchema().setName("Schema 3");
-//
-//			// TODO Check validity of input.
-//			// TODO Connect.
-//			populateTree(dbms);
-//
-//			System.out.println("DBMS Name: " + dbms.getName());
-//		});
-		
-		// Animate settings panels.
-		//settingsPane.getChildren().addListener(new LayoutAnimation());
 	}
 
 	private void populateTree(Project project) {
+        
+        
 		final ListChangeListener<? super TreeItem<Child<?>>> change = l -> {
+
 			System.out.println("Selection changed to: " + 
 				l.getList().stream()
 					.map(i -> i.getValue().getName())
@@ -202,16 +154,18 @@ public class SceneController implements Initializable {
 	private Stream<Setting> settingsFor(Child<?> node) {
 		if (node.is(Column.class)) {
 			final Column column = (Column) node;
-			final Setting setting = new Setting("Generate", "true");
+			final Setting setting = new Setting("Generate", Boolean.toString(column.isEnabled()));
 
 			setting.valueProperty().addListener((ov, o, newValue) -> {
 				System.out.println("Value changed in setting to: " + newValue);
 				treeHierarchy.getSelectionModel().getSelectedItems().stream()
 					.map(i -> i.getValue())
-					.filter(n -> n.is(Column.class))
+					.filter(n -> n.is(Enableable.class))
 					.map(n -> (Column) n)
 					.forEach(c -> c.setEnabled("true".equals(newValue)));
 			});
+            
+            
 
 			return Stream.of(setting);
 		} else {
