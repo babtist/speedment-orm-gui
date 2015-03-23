@@ -21,20 +21,26 @@ import com.speedment.orm.config.model.Project;
 import com.speedment.orm.config.model.aspects.Child;
 import com.speedment.orm.config.model.aspects.Enableable;
 import java.net.URL;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -42,7 +48,6 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.ImageView;
 
 /**
@@ -72,7 +77,7 @@ public class SceneController implements Initializable {
 	@FXML private MenuItem mbGitHub;
 	@FXML private MenuItem mbAbout;
 	@FXML private TableColumn<Setting, String> settingsColumnKey;
-	@FXML private TableColumn<Setting, String> settingsColumnValue;
+	@FXML private TableColumn<Setting, Setting.Value> settingsColumnValue;
 	
 	private final Project project;
 	
@@ -97,12 +102,49 @@ public class SceneController implements Initializable {
 		settingsColumnValue.setCellValueFactory(
 			new PropertyValueFactory<>("value")
 		);
-		settingsColumnValue.setCellFactory(TextFieldTableCell.<Setting>forTableColumn());
+        
+        settingsColumnValue.setCellFactory(s -> new TableCell<Setting, Setting.Value>() {
+
+            final CheckBox checkBox = new CheckBox() {{
+                setAllowIndeterminate(true);
+                selectedProperty().addListener((ob, o, n) -> {
+                    if (shouldUpdate()) {
+                        onCheckboxChange(n);
+                    }
+                });
+            }};
+            
+            protected boolean shouldUpdate() {
+                return (checkBox.equals(getGraphic()));
+            }
+            
+            protected void onCheckboxChange(Boolean b) {
+                System.out.println("Checkbox was set to " + b);
+                System.out.println("Settings old value " + itemProperty().get().name());
+                itemProperty().setValue(b ? Setting.Value.TRUE : Setting.Value.FALSE);
+                System.out.println("Settings new value " + itemProperty().get().name());
+            }
+
+            @Override
+            protected void updateItem(Setting.Value value, boolean empty) {
+                super.updateItem(value, empty);
+                
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    System.out.println("Updating checkbox to: " + value.name());
+                    checkBox.setIndeterminate(Setting.Value.INDETERMINATE == value);
+                    checkBox.setSelected(Setting.Value.TRUE == value);
+                    setGraphic(checkBox);
+                }
+            }
+        });
+
+		//settingsColumnValue.setCellFactory(CheckBoxTableCell.forTableColumn(settingsColumnValue));
 	}
 
 	private void populateTree(Project project) {
-        
-        
+
 		final ListChangeListener<? super TreeItem<Child<?>>> change = l -> {
 
 			System.out.println("Selection changed to: " + 
@@ -113,12 +155,10 @@ public class SceneController implements Initializable {
 			
 			tableSettings.getItems().clear();
 			tableSettings.getItems().addAll(
-				l.getList().stream()
+				settingsFor(
+                    l.getList().stream()
 					.map(i -> i.getValue())
-					.flatMap(i -> settingsFor(i))
-					
-					.distinct()
-					.collect(Collectors.toList())
+                ).collect(Collectors.toList())
 			);
 		};
 		
@@ -150,44 +190,48 @@ public class SceneController implements Initializable {
 
 		return branch;
 	}
+    
+    private Setting mergedSettings(Stream<Child<?>> nodes, String property, Function<Child<?>, Boolean> value) {
+        final List<Boolean> variants = nodes.map(s -> value.apply(s)).distinct().collect(Collectors.toList());
+        System.out.println("Merged variants to a list of " + variants.size());
+        if (variants.size() == 1) {
+            return new Setting(property, variants.get(0) ? Setting.Value.TRUE : Setting.Value.FALSE);
+        } else {
+            return new Setting(property, Setting.Value.INDETERMINATE);
+        }
+    }
 	
-	private Stream<Setting> settingsFor(Child<?> node) {
-		if (node.is(Column.class)) {
-			final Column column = (Column) node;
-			final Setting setting = new Setting("Generate", Boolean.toString(column.isEnabled()));
+	private Stream<Setting> settingsFor(Stream<Child<?>> nodes) {
+		final Setting setting = mergedSettings(nodes, "Generate", c -> c.isEnabled());
 
-			setting.valueProperty().addListener((ov, o, newValue) -> {
-				System.out.println("Value changed in setting to: " + newValue);
-				treeHierarchy.getSelectionModel().getSelectedItems().stream()
-					.map(i -> i.getValue())
-					.filter(n -> n.is(Enableable.class))
-					.map(n -> (Column) n)
-					.forEach(c -> c.setEnabled("true".equals(newValue)));
-			});
-            
-            
+        setting.valueProperty().addListener((ov, o, newValue) -> {
+            System.out.println("Value changed in setting to: " + newValue); // KÖRS ALDRIG??
+            treeHierarchy.getSelectionModel().getSelectedItems().stream()
+                .filter(n -> newValue != Setting.Value.INDETERMINATE)
+                .map(i -> i.getValue())
+                .forEach(c -> c.setEnabled(newValue == Setting.Value.TRUE));
+        });
 
-			return Stream.of(setting);
-		} else {
-			return Stream.empty();
-		}
+        return Stream.of(setting);
 	}
 	
 	public static class Setting {
 		
 		private final StringProperty key;
-		private final StringProperty value;
+		private final ObjectProperty<Value> value;
+
+        public static enum Value {TRUE, FALSE, INDETERMINATE}
 		
-		private Setting(String key, String value) {
+		private Setting(String key, Value value) {
 			this.key   = new SimpleStringProperty(key);
-			this.value = new SimpleStringProperty(value);
+			this.value = new SimpleObjectProperty<>(value);
 		}
-		
+        
 		public StringProperty keyProperty() {
 			return key;
 		}
 		
-		public StringProperty valueProperty() {
+		public ObjectProperty<Value> valueProperty() {
 			return value;
 		}
 		
@@ -195,7 +239,7 @@ public class SceneController implements Initializable {
 			this.key.setValue(key);
 		}
 		
-		public void setValue(String value) {
+		public void setValue(Value value) {
 			this.value.setValue(value);
 		}
 		
@@ -203,7 +247,7 @@ public class SceneController implements Initializable {
 			return key.get();
 		}
 		
-		public String getValue() {
+		public Value getValue() {
 			return value.get();
 		}
 
