@@ -68,7 +68,7 @@
                   </SplitPane>
                   <SplitPane dividerPositions="0.7" layoutX="216.0" layoutY="105.0" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
                     <items>
-                        <ScrollPane prefViewportHeight="342.0" prefViewportWidth="631.0">
+                        <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefViewportHeight="342.0" prefViewportWidth="631.0">
                            <content>
                               <VBox fx:id="propertiesContainer" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
                            </content>

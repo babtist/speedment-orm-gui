@@ -16,10 +16,7 @@
  */
 package com.speedment.orm.gui.properties;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
@@ -29,26 +26,22 @@ import javafx.scene.layout.HBox;
  * @author Emil Forslund
  * @param <V>
  */
-public class TablePropertyController<V> implements Initializable {
+public class TablePropertyController<V> extends HBox {
 	
-	@FXML private HBox containerView;
-	@FXML private Label labelView;
-	
+	private final Label labelView;
 	private final TableProperty<V> property;
 	
 	public TablePropertyController(TableProperty<V> property) {
+		this.labelView = new Label();
 		this.property = property;
-	}
-
-	/**
-	 * Initializes the controller class.
-	 * @param url
-	 * @param rb
-	 */
-	@Override
-	public void initialize(URL url, ResourceBundle rb) {
+		
 		labelView.textProperty().bind(property.nameProperty());
-		containerView.getChildren().add(property.getValueGraphic());
+		labelView.setPadding(new Insets(4));
 		property.getValueGraphic().maxWidth(Double.MAX_VALUE);
+		
+		setSpacing(16);
+		
+		getChildren().add(labelView);
+		getChildren().add(property.getValueGraphic());
 	}
 }

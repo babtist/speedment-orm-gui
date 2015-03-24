@@ -22,7 +22,6 @@ import com.speedment.orm.gui.properties.TableBooleanProperty;
 import com.speedment.orm.gui.properties.TableProperty;
 import com.speedment.orm.gui.properties.TablePropertyController;
 import com.speedment.orm.gui.properties.TableStringProperty;
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
@@ -34,9 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -213,16 +210,19 @@ public class SceneController implements Initializable {
 	private void populatePropertyTable(Stream<TableProperty<?>> properties) {
 		propertiesContainer.getChildren().clear();
 		properties.forEach(p -> {
-			final FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/TableProperty.fxml"));
-			final TablePropertyController control = new TablePropertyController(p);
-			loader.setController(control);
+			final HBox row = new TablePropertyController(p);
+			propertiesContainer.getChildren().add(row);
 			
-			try {
-				final HBox row = (HBox) loader.load();
-				propertiesContainer.getChildren().add(row);
-			} catch (IOException ex) {
-				throw new RuntimeException(ex);
-			}
+//			final FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/TableProperty.fxml"));
+//			final TablePropertyController control = new TablePropertyController(p);
+//			loader.setController(control);
+//			
+//			try {
+//				final HBox row = (HBox) loader.load();
+//				propertiesContainer.getChildren().add(row);
+//			} catch (IOException ex) {
+//				throw new RuntimeException(ex);
+//			}
 		});
 	}
 	
