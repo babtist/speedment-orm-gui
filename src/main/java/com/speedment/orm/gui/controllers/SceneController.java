@@ -148,9 +148,12 @@ public class SceneController implements Initializable {
 			protected void updateItem(Child<?> item, boolean empty) {
 				super.updateItem(item, empty);
 				
-				Optional.ofNullable(item)
-					.filter(i -> !empty)
-					.ifPresent(i -> setText(i.getName()));
+				if (item == null || empty) {
+					setGraphic(null);
+					setText(null);
+				} else {
+					setText(item.getName());
+				}
 			}
 		});
 
