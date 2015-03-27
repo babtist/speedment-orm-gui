@@ -33,7 +33,7 @@ import javafx.util.Duration;
  *
  * @author Emil Forslund
  */
-public class LayoutAnimation implements ChangeListener, ListChangeListener<Node> {
+public class LayoutAnimation implements ChangeListener<Number>, ListChangeListener<Node> {
 
 	private final Map<Node, Transition> nodesInTransition;
 
@@ -63,7 +63,7 @@ public class LayoutAnimation implements ChangeListener, ListChangeListener<Node>
 	}
 
 	@Override
-	public void changed(ObservableValue ov, Object oldValue, Object newValue) {
+	public void changed(ObservableValue<? extends Number> ov, Number oldValue, Number newValue) {
 		final Double oldValueDouble = (Double) oldValue;
 		final Double newValueDouble = (Double) newValue;
 		final Double changeValueDouble = newValueDouble - oldValueDouble;
@@ -98,16 +98,13 @@ public class LayoutAnimation implements ChangeListener, ListChangeListener<Node>
 	}
 
 	@Override
-	public void onChanged(ListChangeListener.Change change) {
+	@SuppressWarnings("unchecked")
+	public void onChanged(Change<? extends Node> change) {
 		while (change.next()) {
 			if (change.wasAdded()) {
-				for (Node node : (List<Node>) change.getAddedSubList()) {
-					this.observe(node);
-				}
+				change.getAddedSubList().forEach(n -> observe(n));
 			} else if (change.wasRemoved()) {
-				for (Node node : (List<Node>) change.getRemoved()) {
-					this.unobserve(node);
-				}
+				change.getRemoved().forEach(n -> unobserve(n));
 			}
 		}
 	}

@@ -178,7 +178,7 @@ public class SceneController implements Initializable {
 	private void populatePropertyTable(Stream<TableProperty<?>> properties) {
 		propertiesContainer.getChildren().clear();
 		properties.forEach(p -> {
-			final HBox row = new TablePropertyController(p);
+			final HBox row = new TablePropertyController<>(p);
 			propertiesContainer.getChildren().add(row);
 		});
 	}
