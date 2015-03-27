@@ -18,13 +18,22 @@
                <children>
                   <HBox alignment="CENTER" prefHeight="38.0" prefWidth="905.0" spacing="16.0" style="-fx-background-color: #eee;">
                      <children>
-                        <Button fx:id="buttonNew" mnemonicParsing="false" text="New">
+                        <Button fx:id="buttonNew" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" text="New" textAlignment="CENTER">
                            <HBox.margin>
                               <Insets left="16.0" />
                            </HBox.margin>
+                           <padding>
+                              <Insets bottom="8.0" left="12.0" right="12.0" top="8.0" />
+                           </padding>
                         </Button>
-                        <Button fx:id="buttonOpen" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="Open" />
-                        <Button fx:id="buttonGenerate" defaultButton="true" layoutX="50.0" layoutY="10.0" mnemonicParsing="false" text="Generate" />
+                        <Button fx:id="buttonOpen" alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="Open" textAlignment="CENTER">
+                           <padding>
+                              <Insets bottom="8.0" left="12.0" right="12.0" top="8.0" />
+                           </padding></Button>
+                        <Button fx:id="buttonGenerate" alignment="CENTER" contentDisplay="CENTER" defaultButton="true" layoutX="50.0" layoutY="10.0" mnemonicParsing="false" text="Generate" textAlignment="CENTER">
+                           <padding>
+                              <Insets bottom="8.0" left="12.0" right="12.0" top="8.0" />
+                           </padding></Button>
                         <Pane maxWidth="1.7976931348623157E308" prefHeight="200.0" HBox.hgrow="ALWAYS" />
                         <ImageView fx:id="logo" fitHeight="48.0" fitWidth="56.0" pickOnBounds="true" preserveRatio="true">
                            <image>

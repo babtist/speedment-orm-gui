@@ -16,12 +16,25 @@
  */
 package com.speedment.orm.gui.controllers;
 
+import com.speedment.orm.config.model.Column;
+import com.speedment.orm.config.model.Dbms;
+import com.speedment.orm.config.model.ForeignKey;
+import com.speedment.orm.config.model.ForeignKeyColumn;
+import com.speedment.orm.config.model.Index;
+import com.speedment.orm.config.model.IndexColumn;
+import com.speedment.orm.config.model.PrimaryKeyColumn;
 import com.speedment.orm.config.model.Project;
+import com.speedment.orm.config.model.ProjectManager;
+import com.speedment.orm.config.model.Schema;
+import com.speedment.orm.config.model.Table;
 import com.speedment.orm.config.model.aspects.Child;
+import com.speedment.orm.config.model.aspects.Node;
 import com.speedment.orm.gui.MainApp;
+import com.speedment.orm.gui.icons.Icons;
+import com.speedment.orm.gui.icons.SilkIcons;
 import com.speedment.orm.gui.properties.TableBooleanProperty;
 import com.speedment.orm.gui.properties.TableProperty;
-import com.speedment.orm.gui.properties.TablePropertyController;
+import com.speedment.orm.gui.properties.TablePropertyRow;
 import com.speedment.orm.gui.properties.TableStringProperty;
 import com.speedment.orm.gui.util.FadeAnimation;
 import java.io.IOException;
@@ -119,6 +132,19 @@ public class SceneController implements Initializable {
 		
 		animateArrow();
 		
+		mbNew.setGraphic(Icons.NEW_PROJECT.view());
+		mbOpen.setGraphic(Icons.OPEN_PROJECT.view());
+		mbSave.setGraphic(SilkIcons.DISK.view());
+		mbSaveAs.setGraphic(SilkIcons.DISK_MULTIPLE.view());
+		mbQuit.setGraphic(SilkIcons.DOOR_IN.view());
+		mbGenerate.setGraphic(Icons.RUN_PROJECT.view());
+		mbGitHub.setGraphic(SilkIcons.USER_COMMENT.view());
+		mbAbout.setGraphic(SilkIcons.INFORMATION.view());
+		
+		buttonNew.setGraphic(Icons.NEW_PROJECT_24.view());
+		buttonOpen.setGraphic(Icons.OPEN_PROJECT_24.view());
+		buttonGenerate.setGraphic(Icons.RUN_PROJECT_24.view());
+		
 		// New project.
 		final EventHandler<ActionEvent> newProject = ev -> {
 			System.out.println("Creating new project.");
@@ -161,6 +187,7 @@ public class SceneController implements Initializable {
 		};
 		
 		treeHierarchy.setCellFactory(v -> new TreeCell<Child<?>>() {
+
 			@Override
 			protected void updateItem(Child<?> item, boolean empty) {
 				super.updateItem(item, empty);
@@ -169,6 +196,7 @@ public class SceneController implements Initializable {
 					setGraphic(null);
 					setText(null);
 				} else {
+					setGraphic(iconFor(item));
 					setText(item.getName());
 				}
 			}
@@ -177,6 +205,34 @@ public class SceneController implements Initializable {
 		treeHierarchy.getSelectionModel().setSelectionMode(MULTIPLE);
 		treeHierarchy.getSelectionModel().getSelectedItems().addListener(change);
 		treeHierarchy.setRoot(branch(project));
+	}
+	
+	private ImageView iconFor(Node node) {
+		if (node.is(Dbms.class)) {
+			return Icons.DBMS.view();
+		} else if (node.is(Schema.class)) {
+			return Icons.SCHEMA.view();
+		} else if (node.is(Table.class)) {
+			return Icons.TABLE.view();
+		} else if (node.is(Column.class)) {
+			return Icons.COLUMN.view();
+		} else if (node.is(Index.class)) {
+			return Icons.INDEX.view();
+		} else if (node.is(IndexColumn.class)) {
+			return Icons.INDEX_COLUMN.view();
+		} else if (node.is(ForeignKey.class)) {
+			return Icons.FOREIGN_KEY.view();
+		} else if (node.is(ForeignKeyColumn.class)) {
+			return Icons.FOREIGN_KEY_COLUMN.view();
+		} else if (node.is(PrimaryKeyColumn.class)) {
+			return Icons.PRIMARY_KEY_COLUMN.view();
+		} else if (node.is(Project.class)) {
+			return Icons.PROJECT.view();
+		} else if (node.is(ProjectManager.class)) {
+			return Icons.PROJECT_MANAGER.view();
+		} else {
+			throw new RuntimeException("Unknown node type '" + node.getInterfaceMainClass().getName() + "'.");
+		}
 	}
 
 	private TreeItem<Child<?>> branch(Child<?> node) {
@@ -195,7 +251,7 @@ public class SceneController implements Initializable {
 	private void populatePropertyTable(Stream<TableProperty<?>> properties) {
 		propertiesContainer.getChildren().clear();
 		properties.forEach(p -> {
-			final HBox row = new TablePropertyController<>(p);
+			final HBox row = new TablePropertyRow<>(p);
 			propertiesContainer.getChildren().add(row);
 		});
 	}
@@ -231,7 +287,6 @@ public class SceneController implements Initializable {
 	}
 	
 	private void animateArrow() {
-		// Animate arrow.
 		final DropShadow glow = new DropShadow();
 		glow.setBlurType(BlurType.TWO_PASS_BOX);
 		glow.setColor(Color.rgb(0, 255, 255, 1.0));

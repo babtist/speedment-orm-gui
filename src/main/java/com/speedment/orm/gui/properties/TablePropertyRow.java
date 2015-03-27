@@ -27,12 +27,12 @@ import javafx.scene.layout.HBox;
  * @author Emil Forslund
  * @param <V>
  */
-public class TablePropertyController<V> extends HBox {
+public class TablePropertyRow<V> extends HBox {
 	
 	private final Label labelView;
 	private final TableProperty<V> property;
 	
-	public TablePropertyController(TableProperty<V> property) {
+	public TablePropertyRow(TableProperty<V> property) {
 		this.labelView = new Label();
 		this.property = property;
 		
