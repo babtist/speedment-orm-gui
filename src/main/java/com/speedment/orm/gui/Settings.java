@@ -1,13 +1,19 @@
 package com.speedment.orm.gui;
 
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.time.Instant;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 /**
  * Singleton.
@@ -17,6 +23,17 @@ import java.util.Properties;
 public final class Settings {
 
 	private final static File SETTINGS_FILE = new File("settings.properties");
+	private final static URL SYNC_URL;
+	private final static boolean SYNC = false;
+	
+	static {
+		final String url = "https://www.speedment.org/community/";
+		try {
+			SYNC_URL = new URL(url);
+		} catch (MalformedURLException ex) {
+			throw new RuntimeException("Sync URL is mailformed: '" + url + "'.");
+		}
+	}
 	
 	private final Properties props;
 	
@@ -67,6 +84,18 @@ public final class Settings {
 		return Integer.parseInt(props.getProperty(key, Integer.toString(defaultValue)));
 	}
 	
+	private String encode() {
+		return props.entrySet().stream()
+			.map(e -> {
+				try {
+					return URLEncoder.encode(e.getKey().toString(), "UTF-8") + "=" + 
+						   URLEncoder.encode(e.getValue().toString(), "UTF-8");
+				} catch (UnsupportedEncodingException ex) {
+					throw new RuntimeException("Encoding 'UTF-8' is not supported.");
+				}
+			}).collect(Collectors.joining("&"));
+	}
+	
 	private void storeChanges() {
 		try (final OutputStream out = new FileOutputStream(SETTINGS_FILE, false)) {
 			props.store(out, "Speedment ORM Settings");
@@ -74,6 +103,23 @@ public final class Settings {
 			throw new RuntimeException(
 				"Could not save file '" + filename() + "'."
 			);
+		}
+		
+		if (SYNC) {
+			try {
+				final HttpURLConnection con = (HttpURLConnection) SYNC_URL.openConnection();
+				con.setRequestMethod("POST");
+				
+				try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
+					wr.writeBytes(encode());
+					wr.flush();
+					wr.close();
+				}
+			} catch (IOException ex) {
+				throw new RuntimeException(
+					"Could not sync to url '" + SYNC_URL.toString() + "'."
+				);
+			}
 		}
 	}
 	
