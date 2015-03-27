@@ -8,9 +8,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="310.0" prefWidth="540.0" spacing="6.0" style="-fx-background-color: #ddd;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<HBox fx:id="container" alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="6.0" style="-fx-background-color: #ddd;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="200.0" style="-fx-background-color: #f5f5f5;" HBox.hgrow="ALWAYS">
+      <StackPane fx:id="openContainer" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="280.0" style="-fx-background-color: #f5f5f5;" HBox.hgrow="ALWAYS">
          <children>
             <Label text="Open existing project" textFill="#3e6293" StackPane.alignment="TOP_CENTER">
                <font>
@@ -30,7 +30,7 @@
             <Insets />
          </HBox.margin>
       </StackPane>
-      <VBox alignment="TOP_RIGHT" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" spacing="16.0" style="-fx-background-color: #f5f5f5;" HBox.hgrow="ALWAYS">
+      <VBox alignment="TOP_RIGHT" maxWidth="-Infinity" prefHeight="200.0" prefWidth="280.0" spacing="16.0" style="-fx-background-color: #f5f5f5;" HBox.hgrow="ALWAYS">
          <children>
             <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Create from database" textFill="#3f6291">
                <font>

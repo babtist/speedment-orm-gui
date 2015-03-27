@@ -23,6 +23,7 @@ import com.speedment.orm.config.model.Schema;
 import com.speedment.orm.config.model.Table;
 import com.speedment.orm.config.model.parameters.StandardDbmsType;
 import com.speedment.orm.gui.MainApp;
+import com.speedment.orm.gui.Settings;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -37,8 +38,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 /**
@@ -56,6 +57,8 @@ public class ProjectPromptController implements Initializable {
 	@FXML private TextField fieldUser;
 	@FXML private PasswordField fieldPass;
 	@FXML private Button buttonConnect;
+	@FXML private HBox container;
+	@FXML private StackPane openContainer;
 	
 	private final Stage stage;
 	
@@ -70,6 +73,10 @@ public class ProjectPromptController implements Initializable {
 	 */
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
+		
+		if (Settings.inst().get("hide_open_option", true)) {
+			container.getChildren().remove(openContainer);
+		}
         
 		fieldType.setItems(
 			Stream.of(StandardDbmsType.values())
@@ -154,6 +161,7 @@ public class ProjectPromptController implements Initializable {
 			tableB.add(columnB4);
 			
 			SceneController.showIn(stage, project);
+			Settings.inst().set("hide_open_option", false);
 		});
 	}
 	

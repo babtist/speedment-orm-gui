@@ -17,6 +17,7 @@
 package com.speedment.orm.gui;
 
 import com.speedment.orm.gui.controllers.MailPromptController;
+import com.speedment.orm.gui.controllers.ProjectPromptController;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -28,7 +29,11 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        MailPromptController.showIn(stage);
+		if (Settings.inst().has("user_mail")) {
+			ProjectPromptController.showIn(stage);
+		} else {
+			MailPromptController.showIn(stage);
+		}
 		stage.show();
     }
 

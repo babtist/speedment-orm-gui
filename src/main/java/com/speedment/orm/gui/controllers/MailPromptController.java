@@ -17,6 +17,7 @@
 package com.speedment.orm.gui.controllers;
 
 import com.speedment.orm.gui.MainApp;
+import com.speedment.orm.gui.Settings;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -28,7 +29,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -66,6 +66,7 @@ public class MailPromptController implements Initializable {
 		
 		buttonOkey.setOnAction(ev -> {
 			ProjectPromptController.showIn(stage);
+			Settings.inst().set("user_mail", fieldMail.getText());
 		});
 	}
 	
