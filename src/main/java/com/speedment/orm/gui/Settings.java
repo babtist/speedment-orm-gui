@@ -113,7 +113,6 @@ public final class Settings {
 				try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
 					wr.writeBytes(encode());
 					wr.flush();
-					wr.close();
 				}
 			} catch (IOException ex) {
 				throw new RuntimeException(
