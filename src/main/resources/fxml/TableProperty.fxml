@@ -7,8 +7,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
-<HBox fx:id="containerView" alignment="TOP_CENTER" maxWidth="1.7976931348623157E308" spacing="16.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<HBox fx:id="containerView" alignment="TOP_CENTER" maxWidth="1.7976931348623157E308" spacing="16.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fxml.TablePropertyController">
    <children>
       <Label fx:id="labelView" maxWidth="1.7976931348623157E308" text="Label of property" HBox.hgrow="ALWAYS">
          <HBox.margin>

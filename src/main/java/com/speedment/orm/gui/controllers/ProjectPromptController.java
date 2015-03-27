@@ -22,6 +22,7 @@ import com.speedment.orm.config.model.Project;
 import com.speedment.orm.config.model.Schema;
 import com.speedment.orm.config.model.Table;
 import com.speedment.orm.config.model.parameters.StandardDbmsType;
+import com.speedment.orm.gui.MainApp;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -37,6 +38,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 /**
@@ -151,23 +153,7 @@ public class ProjectPromptController implements Initializable {
 			columnB4.setName("uploaded");
 			tableB.add(columnB4);
 			
-
-			final FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Scene.fxml"));
-			final SceneController control = new SceneController(project);
-			loader.setController(control);
-			
-			try {
-				final BorderPane root = (BorderPane) loader.load();
-				final Scene scene = new Scene(root);
-
-				stage.hide();
-				stage.setTitle("Speedment ORM");
-				stage.setMaximized(true);
-				stage.setScene(scene);
-				stage.show();
-			} catch (IOException ex) {
-				throw new RuntimeException(ex);
-			}
+			SceneController.showIn(stage, project);
 		});
 	}
 	
@@ -179,5 +165,23 @@ public class ProjectPromptController implements Initializable {
 			fieldName.textProperty().getValue().isEmpty() ||
 			fieldUser.textProperty().getValue().isEmpty()
 		);
+	}
+	
+	public static void showIn(Stage stage) {
+		final FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/ProjectPrompt.fxml"));
+		final ProjectPromptController control = new ProjectPromptController(stage);
+		loader.setController(control);
+
+		try {
+			final HBox root = (HBox) loader.load();
+			final Scene scene = new Scene(root);
+
+			stage.hide();
+			stage.setTitle("Speedment ORM - New project");
+			stage.setScene(scene);
+			stage.show();
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 }

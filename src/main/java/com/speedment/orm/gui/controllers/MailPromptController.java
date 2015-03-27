@@ -16,6 +16,7 @@
  */
 package com.speedment.orm.gui.controllers;
 
+import com.speedment.orm.gui.MainApp;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -28,6 +29,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
@@ -63,19 +65,23 @@ public class MailPromptController implements Initializable {
 		});
 		
 		buttonOkey.setOnAction(ev -> {
-			final FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ProjectPrompt.fxml"));
-			final ProjectPromptController control = new ProjectPromptController(stage);
-			loader.setController(control);
-			
-			try {
-				final HBox root = (HBox) loader.load();
-				final Scene scene = new Scene(root);
-
-				stage.setTitle("Speedment ORM - New project");
-				stage.setScene(scene);
-			} catch (IOException ex) {
-				throw new RuntimeException(ex);
-			}
+			ProjectPromptController.showIn(stage);
 		});
+	}
+	
+	public static void showIn(Stage stage) {
+		final FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/MailPrompt.fxml"));
+        final MailPromptController control = new MailPromptController(stage);
+		loader.setController(control);
+		
+		try {
+			final VBox root = (VBox) loader.load();
+			final Scene scene = new Scene(root);
+
+			stage.setTitle("Please enter your email");
+			stage.setScene(scene);
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 }

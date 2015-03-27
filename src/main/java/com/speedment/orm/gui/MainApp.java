@@ -18,9 +18,6 @@ package com.speedment.orm.gui;
 
 import com.speedment.orm.gui.controllers.MailPromptController;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
@@ -31,15 +28,7 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        final FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MailPrompt.fxml"));
-        final MailPromptController control = new MailPromptController(stage);
-		loader.setController(control);
-		
-		final VBox root = (VBox) loader.load();
-		final Scene scene = new Scene(root);
-
-		stage.setTitle("Please enter your email");
-		stage.setScene(scene);
+        MailPromptController.showIn(stage);
 		stage.show();
     }
 

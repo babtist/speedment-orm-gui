@@ -70,7 +70,10 @@
                     <items>
                         <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefViewportHeight="342.0" prefViewportWidth="631.0">
                            <content>
-                              <VBox fx:id="propertiesContainer" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+                              <VBox fx:id="propertiesContainer" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="12.0">
+                                 <padding>
+                                    <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+                                 </padding></VBox>
                            </content>
                         </ScrollPane>
                         <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="216.0" layoutY="-19.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0">

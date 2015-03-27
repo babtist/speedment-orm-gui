@@ -17,6 +17,7 @@
 package com.speedment.orm.gui.properties;
 
 import javafx.beans.property.Property;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 
@@ -31,6 +32,7 @@ public class TableBooleanProperty extends TableProperty<Boolean> {
 	public TableBooleanProperty(String name, Boolean value) {
 		super (name);
 		checkbox = new CheckBox();
+		checkbox.setAlignment(Pos.CENTER);
 		
 		if (value == null) {
 			checkbox.setIndeterminate(true);

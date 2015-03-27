@@ -17,6 +17,7 @@
 package com.speedment.orm.gui.properties;
 
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
@@ -40,6 +41,7 @@ public class TablePropertyController<V> extends HBox {
 		property.getValueGraphic().maxWidth(Double.MAX_VALUE);
 		
 		setSpacing(16);
+		setAlignment(Pos.CENTER_LEFT);
 		
 		getChildren().add(labelView);
 		getChildren().add(property.getValueGraphic());

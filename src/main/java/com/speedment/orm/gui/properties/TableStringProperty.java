@@ -33,7 +33,7 @@ public class TableStringProperty extends TableProperty<String> {
 		textfield = new TextField();
 		
 		if (value == null) {
-			textfield.setText("");
+			textfield.setText("...");
 		} else {
 			textfield.setText(value);
 		}
