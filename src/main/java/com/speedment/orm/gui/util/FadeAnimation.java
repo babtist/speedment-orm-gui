@@ -16,7 +16,6 @@
  */
 package com.speedment.orm.gui.util;
 
-import java.util.function.Consumer;
 import javafx.animation.FadeTransition;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

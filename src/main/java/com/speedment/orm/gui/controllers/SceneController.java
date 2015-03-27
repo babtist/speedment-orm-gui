@@ -23,24 +23,31 @@ import com.speedment.orm.gui.properties.TableBooleanProperty;
 import com.speedment.orm.gui.properties.TableProperty;
 import com.speedment.orm.gui.properties.TablePropertyController;
 import com.speedment.orm.gui.properties.TableStringProperty;
+import com.speedment.orm.gui.util.FadeAnimation;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import static javafx.animation.Animation.INDEFINITE;
+import static javafx.animation.Interpolator.EASE_BOTH;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
@@ -49,13 +56,19 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.effect.BlurType;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import static javafx.util.Duration.ZERO;
+import static javafx.util.Duration.millis;
 
 /**
  * FXML Controller class
@@ -83,6 +96,8 @@ public class SceneController implements Initializable {
 	@FXML private Menu menuHelp;
 	@FXML private MenuItem mbGitHub;
 	@FXML private MenuItem mbAbout;
+	@FXML private StackPane arrowContainer;
+	@FXML private Label arrow;
 	
 	private final Stage stage;
 	private final Project project;
@@ -101,6 +116,8 @@ public class SceneController implements Initializable {
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
 		populateTree(project);
+		
+		animateArrow();
 		
 		// New project.
 		final EventHandler<ActionEvent> newProject = ev -> {
@@ -213,13 +230,47 @@ public class SceneController implements Initializable {
 		}
 	}
 	
+	private void animateArrow() {
+		// Animate arrow.
+		final DropShadow glow = new DropShadow();
+		glow.setBlurType(BlurType.TWO_PASS_BOX);
+		glow.setColor(Color.rgb(0, 255, 255, 1.0));
+		glow.setWidth(20);
+		glow.setHeight(20);
+		glow.setRadius(0.0);
+		arrow.setEffect(glow);
+
+		final KeyFrame kf0 = new KeyFrame(ZERO, 
+			new KeyValue(arrow.translateXProperty(), 55, EASE_BOTH),
+			new KeyValue(arrow.translateYProperty(), -15, EASE_BOTH),
+			new KeyValue(glow.radiusProperty(), 32, EASE_BOTH)
+		);
+		
+		final KeyFrame kf1 = new KeyFrame(millis(400), 
+			new KeyValue(arrow.translateXProperty(), 45, EASE_BOTH),
+			new KeyValue(arrow.translateYProperty(), 5, EASE_BOTH),
+			new KeyValue(glow.radiusProperty(), 0, EASE_BOTH)
+		);
+		
+		final Timeline tl = new Timeline(kf0, kf1);
+		tl.setAutoReverse(true);
+		tl.setCycleCount(INDEFINITE);
+		tl.play();
+
+		final EventHandler<MouseEvent> over = ev -> {
+			FadeAnimation.fadeOut(arrow, e -> arrowContainer.getChildren().remove(arrow));
+		};
+		
+		arrow.setOnMouseEntered(over);
+	}
+	
 	public static void showIn(Stage stage, Project project) {
 		final FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/Scene.fxml"));
 		final SceneController control = new SceneController(stage, project);
 		loader.setController(control);
 
 		try {
-			final BorderPane root = (BorderPane) loader.load();
+			final Parent root = (Parent) loader.load();
 			final Scene scene = new Scene(root);
 
 			stage.hide();
