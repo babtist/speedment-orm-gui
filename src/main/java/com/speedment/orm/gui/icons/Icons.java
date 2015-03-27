@@ -1,6 +1,36 @@
+/**
+ *
+ * Copyright (c) 2006-2015, Speedment, Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); You may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at:
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.speedment.orm.gui.icons;
 
+import com.speedment.orm.config.model.Column;
+import com.speedment.orm.config.model.Dbms;
+import com.speedment.orm.config.model.ForeignKey;
+import com.speedment.orm.config.model.ForeignKeyColumn;
+import com.speedment.orm.config.model.Index;
+import com.speedment.orm.config.model.IndexColumn;
+import com.speedment.orm.config.model.PrimaryKeyColumn;
+import com.speedment.orm.config.model.Project;
+import com.speedment.orm.config.model.ProjectManager;
+import com.speedment.orm.config.model.Schema;
+import com.speedment.orm.config.model.Table;
 import java.io.InputStream;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -31,12 +61,29 @@ public enum Icons {
 	ADD_DBMS_TRANS ("pics/dialog/add_dbms_trans.png"),
 	OPEN_FILE ("pics/dialog/openFile.png"),
 	QUESTION ("pics/dialog/question.png"),
-	SPEEDMENT_LOGO ("pics/dialog/speedment_logo100.png"),
+	SPEEDMENT_LOGO ("pics/dialog/speedment_logo.png"),
+	SPEEDMENT_LOGO_100 ("pics/dialog/speedment_logo100.png"),
 	WALKING_MAN ("pics/dialog/walking_man.gif"),
 	WALKING_MAN_SMALL ("pics/dialog/walking_man_small.png");
 
 	private final static String FOLDER = "/";
 	private final String icon;
+	
+	private static final Map<Class<?>, Icons> NODE_ICONS = new ConcurrentHashMap<>();
+	
+	static {
+		NODE_ICONS.put(Dbms.class, DBMS);
+		NODE_ICONS.put(Schema.class, SCHEMA);
+		NODE_ICONS.put(Table.class, TABLE);
+		NODE_ICONS.put(Column.class, COLUMN);
+		NODE_ICONS.put(Index.class, INDEX);
+		NODE_ICONS.put(IndexColumn.class, INDEX_COLUMN);
+		NODE_ICONS.put(ForeignKey.class, FOREIGN_KEY);
+		NODE_ICONS.put(ForeignKeyColumn.class, FOREIGN_KEY_COLUMN);
+		NODE_ICONS.put(PrimaryKeyColumn.class, PRIMARY_KEY_COLUMN);
+		NODE_ICONS.put(Project.class, PROJECT);
+		NODE_ICONS.put(ProjectManager.class, PROJECT_MANAGER);
+	}
 	
 	private Icons(String icon) {
 		this.icon = icon;
@@ -62,5 +109,9 @@ public enum Icons {
 	
 	public ImageView view() {
 		return new ImageView(load());
+	}
+	
+	public static Icons forNodeType(Class<?> clazz) {
+		return NODE_ICONS.get(clazz);
 	}
 }

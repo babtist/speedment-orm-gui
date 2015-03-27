@@ -16,6 +16,8 @@
  */
 package com.speedment.orm.gui.properties;
 
+import java.util.Objects;
+import java.util.Optional;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -40,4 +42,20 @@ public abstract class TableProperty<V> {
 
 	public abstract Property<V> valueProperty();
 	public abstract Node getValueGraphic();
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(this.name);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return Optional.ofNullable(obj)
+			.filter(o -> TableProperty.class.isAssignableFrom(o.getClass()))
+			.map(o -> (TableProperty) o)
+			.filter(tp -> name.equals(tp.name))
+			.isPresent();
+	}
+	
+	
 }

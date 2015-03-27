@@ -16,30 +16,28 @@
  */
 package com.speedment.orm.gui.controllers;
 
-import com.speedment.orm.config.model.Column;
-import com.speedment.orm.config.model.Dbms;
-import com.speedment.orm.config.model.ForeignKey;
-import com.speedment.orm.config.model.ForeignKeyColumn;
-import com.speedment.orm.config.model.Index;
-import com.speedment.orm.config.model.IndexColumn;
-import com.speedment.orm.config.model.PrimaryKeyColumn;
+import com.speedment.orm.config.model.External;
 import com.speedment.orm.config.model.Project;
-import com.speedment.orm.config.model.ProjectManager;
-import com.speedment.orm.config.model.Schema;
-import com.speedment.orm.config.model.Table;
 import com.speedment.orm.config.model.aspects.Child;
 import com.speedment.orm.config.model.aspects.Node;
+import com.speedment.orm.config.model.impl.utils.MethodsParser;
 import com.speedment.orm.gui.MainApp;
 import com.speedment.orm.gui.icons.Icons;
 import com.speedment.orm.gui.icons.SilkIcons;
 import com.speedment.orm.gui.properties.TableBooleanProperty;
+import com.speedment.orm.gui.properties.TableClassProperty;
+import com.speedment.orm.gui.properties.TableEnumProperty;
 import com.speedment.orm.gui.properties.TableProperty;
 import com.speedment.orm.gui.properties.TablePropertyRow;
 import com.speedment.orm.gui.properties.TableStringProperty;
 import com.speedment.orm.gui.util.FadeAnimation;
+import com.speedment.util.java.JavaLanguage;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -208,30 +206,12 @@ public class SceneController implements Initializable {
 	}
 	
 	private ImageView iconFor(Node node) {
-		if (node.is(Dbms.class)) {
-			return Icons.DBMS.view();
-		} else if (node.is(Schema.class)) {
-			return Icons.SCHEMA.view();
-		} else if (node.is(Table.class)) {
-			return Icons.TABLE.view();
-		} else if (node.is(Column.class)) {
-			return Icons.COLUMN.view();
-		} else if (node.is(Index.class)) {
-			return Icons.INDEX.view();
-		} else if (node.is(IndexColumn.class)) {
-			return Icons.INDEX_COLUMN.view();
-		} else if (node.is(ForeignKey.class)) {
-			return Icons.FOREIGN_KEY.view();
-		} else if (node.is(ForeignKeyColumn.class)) {
-			return Icons.FOREIGN_KEY_COLUMN.view();
-		} else if (node.is(PrimaryKeyColumn.class)) {
-			return Icons.PRIMARY_KEY_COLUMN.view();
-		} else if (node.is(Project.class)) {
-			return Icons.PROJECT.view();
-		} else if (node.is(ProjectManager.class)) {
-			return Icons.PROJECT_MANAGER.view();
-		} else {
+		final Icons icon = Icons.forNodeType(node.getInterfaceMainClass());
+		
+		if (icon == null) {
 			throw new RuntimeException("Unknown node type '" + node.getInterfaceMainClass().getName() + "'.");
+		} else {
+			return icon.view();
 		}
 	}
 
@@ -257,14 +237,132 @@ public class SceneController implements Initializable {
 	}
 	
 	private Stream<TableProperty<?>> propertiesFor(List<Child<?>> nodes) {
-        return Stream.of(
-			createProperty("Name", nodes, TableStringProperty::new, n -> n.getName(), (n, v) -> n.setName(v)),
-			createProperty("Include in generation", nodes, TableBooleanProperty::new, n -> n.isEnabled(), (n, v) -> n.setEnabled(v))
-		);
+		
+		return nodes.stream().flatMap(node -> {
+			System.out.println(node);
+			return MethodsParser.streamOfExternal(node.getClass())
+				.sorted((m0, m1) -> m0.getName().compareTo(m1.getName()))
+				.map(m -> {
+					final String javaName;
+					if (m.getName().startsWith("is")) {
+						javaName = m.getName().substring(2);
+					} else {
+						javaName = m.getName().substring(3);
+					}
+					
+					final String propertyName = JavaLanguage.toHumanReadable(javaName);
+					final External e = MethodsParser.getExternalFor(m, node.getClass());
+					
+					System.out.println(m);
+					
+					Class<?> type = m.getReturnType();
+					Class<?> innerType = e.type();
+					boolean optional = Optional.class.isAssignableFrom(type);
+
+					if (Boolean.class.isAssignableFrom(innerType)) {
+						return createBooleanProperty(propertyName, nodes, 
+							findGetter(node.getClass(), javaName, optional, innerType), 
+							findSetter(node.getClass(), javaName, Boolean.class)
+						);
+					} else if (String.class.isAssignableFrom(innerType)) {
+						return createStringProperty(propertyName, nodes, 
+							findGetter(node.getClass(), javaName, optional, innerType), 
+							findSetter(node.getClass(), javaName, String.class)
+						);
+					} else if (Class.class.isAssignableFrom(innerType)) {
+						return createClassProperty(propertyName, nodes, 
+							findGetter(node.getClass(), javaName, optional, innerType), 
+							findSetter(node.getClass(), javaName, Class.class)
+						);
+					} else if (Enum.class.isAssignableFrom(innerType)) {
+						return createEnumProperty(propertyName, nodes, 
+							findGetter(node.getClass(), javaName, optional, Enum.class), 
+							findSetter(node.getClass(), javaName, (Class<Enum>) innerType),
+							(Enum) type.getEnumConstants()[0]
+						);
+					} else {
+						throw new UnsupportedOperationException("Found method '" + m + "' marked as @External of unsupported type " + type.getName());
+					}
+				});
+		}).distinct().map(tp -> (TableProperty<?>) tp);
+		
+//        return Stream.of(
+//			createProperty("Name", nodes, TableStringProperty::new, n -> n.getName(), (n, v) -> n.setName(v)),
+//			createProperty("Include in generation", nodes, TableBooleanProperty::new, n -> n.isEnabled(), (n, v) -> n.setEnabled(v))
+//		);
+	}
+	
+	private <V> Function<Child<?>, V> findGetter(Class<?> nodeClass, String javaName, boolean optional, Class<?> innerType) {
+		final String methodName;
+		
+		if (Boolean.class.isAssignableFrom(innerType)) {
+			methodName = "is" + javaName;
+		} else {
+			methodName = "get" + javaName;
+		}
+
+		try {
+			final Method method = nodeClass.getMethod(methodName);
+			return c -> {
+				try {
+					if (optional) {
+						return ((Optional<V>) method.invoke(c)).orElse(null);
+					} else {
+						return (V) method.invoke(c);
+					}
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+					throw new RuntimeException("Could not invoke method '" + methodName + "' in class '" + nodeClass.getName() + "'.");
+				}
+			};
+		} catch (NoSuchMethodException ex) {
+			throw new RuntimeException("Could not find @External method '" + methodName + "' in class '" + nodeClass.getName() + "'.");
+		}
+	}
+	
+	private <V> BiConsumer<Child<?>, V> findSetter(Class<?> nodeClass, String javaName, Class<V> paramType) {
+		final String methodName = "set" + javaName;
+		
+		try {
+			final Method method = nodeClass.getMethod(methodName, paramType);
+			return (c, v) -> {
+				try {
+					method.invoke(c, v);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+					throw new RuntimeException("Could not invoke method '" + methodName + "' in class '" + nodeClass.getName() + "'.");
+				}
+			};
+		} catch (NoSuchMethodException ex) {
+			throw new RuntimeException("Could not find @External method '" + methodName + "' with param '" + paramType + "' in class '" + nodeClass.getName() + "'.");
+		}
+	}
+	
+	private TableProperty<Boolean> createBooleanProperty(String label, List<Child<?>> nodes, Function<Child<?>, Boolean> selector, BiConsumer<Child<?>, Boolean> updater) {
+		return createProperty(label, nodes, TableBooleanProperty::new, selector, updater);
+	}
+	
+	private TableProperty<String> createStringProperty(String label, List<Child<?>> nodes, Function<Child<?>, String> selector, BiConsumer<Child<?>, String> updater) {
+		return createProperty(label, nodes, TableStringProperty::new, selector, updater);
+	}
+	
+	private TableProperty<Class> createClassProperty(String label, List<Child<?>> nodes, Function<Child<?>, Class> selector, BiConsumer<Child<?>, Class> updater) {
+		return createProperty(label, nodes, TableClassProperty::new, selector, updater);
+	}
+	
+	private <V extends Enum<V>> TableProperty<V> createEnumProperty(String label, List<Child<?>> nodes, Function<Child<?>, V> selector, BiConsumer<Child<?>, V> updater, V defaultValue) {
+		return createProperty(label, nodes, TableEnumProperty::new, selector, updater, defaultValue);
 	}
 	
 	private <V> TableProperty<V> createProperty(String label, List<Child<?>> nodes, BiFunction<String, V, TableProperty<V>> initiator, Function<Child<?>, V> selector, BiConsumer<Child<?>, V> updater) {
-		final V option = getOption(nodes, selector);
+		return createProperty(label, nodes, initiator, selector, updater, null);
+	}
+	
+	private <V> TableProperty<V> createProperty(String label, List<Child<?>> nodes, BiFunction<String, V, TableProperty<V>> initiator, Function<Child<?>, V> selector, BiConsumer<Child<?>, V> updater, V defaultValue) {
+		V option = getOption(nodes, selector);
+		
+		if (option == null) {
+			option = defaultValue;
+		}
+		
 		final TableProperty<V> property = initiator.apply(label, option);
 		
 		property.valueProperty().addListener((ob, o, newValue) -> {
