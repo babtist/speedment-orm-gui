@@ -16,37 +16,19 @@
  */
 package com.speedment.orm.gui.controllers;
 
-import com.speedment.orm.config.model.External;
 import com.speedment.orm.config.model.Project;
 import com.speedment.orm.config.model.aspects.Child;
 import com.speedment.orm.config.model.aspects.Node;
-import com.speedment.orm.config.model.impl.utils.MethodsParser;
-import com.speedment.orm.config.model.parameters.DbmsType;
 import com.speedment.orm.gui.MainApp;
 import com.speedment.orm.gui.icons.Icons;
 import com.speedment.orm.gui.icons.SilkIcons;
-import com.speedment.orm.gui.properties.TableBooleanProperty;
-import com.speedment.orm.gui.properties.TableClassProperty;
-import com.speedment.orm.gui.properties.TableDbmsTypeProperty;
-import com.speedment.orm.gui.properties.TableEnumProperty;
-import com.speedment.orm.gui.properties.TableNumberProperty;
-import com.speedment.orm.gui.properties.TablePasswordProperty;
 import com.speedment.orm.gui.properties.TableProperty;
 import com.speedment.orm.gui.properties.TablePropertyManager;
 import com.speedment.orm.gui.properties.TablePropertyRow;
-import com.speedment.orm.gui.properties.TableStringProperty;
 import com.speedment.orm.gui.util.FadeAnimation;
-import com.speedment.util.java.JavaLanguage;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import static javafx.animation.Animation.INDEFINITE;
