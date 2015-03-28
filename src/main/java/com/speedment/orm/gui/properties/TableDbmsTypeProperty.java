@@ -16,72 +16,66 @@
  */
 package com.speedment.orm.gui.properties;
 
-import com.speedment.orm.runtime.typemapping.StandardJavaTypeMapping;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.speedment.orm.config.model.parameters.DbmsType;
+import com.speedment.orm.config.model.parameters.StandardDbmsType;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javafx.beans.binding.ObjectBinding;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.Node;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.util.StringConverter;
 
 /**
  *
  * @author Emil Forslund
+ * @param <T>
  */
-public class TableClassProperty extends TableProperty<Class> {
+public class TableDbmsTypeProperty extends TableProperty<DbmsType> {
 	
-	private final ComboBox combo;
+	private final ChoiceBox<DbmsType> choice;
 
-	public TableClassProperty(String name, Class value) {
+	public TableDbmsTypeProperty(String name, DbmsType value) {
 		super (name);
-		combo = new ComboBox(
-			Stream.of(StandardJavaTypeMapping.values())
-				.map(v -> v.getJavaClass())
+		
+		choice = new ChoiceBox(
+			Stream.of(StandardDbmsType.values())
+				.map(e -> (DbmsType) e)
 				.collect(Collectors.toCollection(
 					FXCollections::observableArrayList
 				))
 		);
 		
-		combo.setEditable(true);
+		choice.setValue(value);
 		
-		if (value != null) {
-			combo.setValue(value);
-		}
-		
-		combo.setConverter(new StringConverter<Class>() {
+		choice.setConverter(new StringConverter<DbmsType>() {
 			@Override
-			public String toString(Class clazz) {
-				if (clazz == null) {
-					return "";
+			public String toString(DbmsType object) {
+				final String str = object.getName();
+				if (str.length() < 2) {
+					return str.toUpperCase();
 				} else {
-					return clazz.getName();
+					return str.substring(0, 1).toUpperCase() + str.substring(1, str.length());
 				}
 			}
 
 			@Override
-			public Class fromString(String string) {
-				try {
-					return Class.forName(string);
-				} catch (ClassNotFoundException ex) {
-					return null;
-				}
+			public DbmsType fromString(String string) {
+				return Stream.of(StandardDbmsType.values())
+					.map(e -> (DbmsType) e)
+					.filter(e -> e.getName().equalsIgnoreCase(string))
+					.findAny().orElse(null);
 			}
 		});
 	}
 
 	@Override
-	public Property<Class> valueProperty() {
-		return combo.valueProperty();
+	public Property<DbmsType> valueProperty() {
+		return choice.valueProperty();
 	}
 
 	@Override
 	public Node getValueGraphic() {
-		return combo;
+		return choice;
 	}
 }

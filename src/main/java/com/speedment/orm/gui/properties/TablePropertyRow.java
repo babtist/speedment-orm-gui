@@ -38,6 +38,7 @@ public class TablePropertyRow<V> extends HBox {
 		
 		labelView.textProperty().bind(property.nameProperty());
 		labelView.setPadding(new Insets(4));
+		labelView.setMinWidth(240);
 		property.getValueGraphic().maxWidth(Double.MAX_VALUE);
 		
 		setSpacing(16);

@@ -21,13 +21,18 @@ import com.speedment.orm.config.model.Project;
 import com.speedment.orm.config.model.aspects.Child;
 import com.speedment.orm.config.model.aspects.Node;
 import com.speedment.orm.config.model.impl.utils.MethodsParser;
+import com.speedment.orm.config.model.parameters.DbmsType;
 import com.speedment.orm.gui.MainApp;
 import com.speedment.orm.gui.icons.Icons;
 import com.speedment.orm.gui.icons.SilkIcons;
 import com.speedment.orm.gui.properties.TableBooleanProperty;
 import com.speedment.orm.gui.properties.TableClassProperty;
+import com.speedment.orm.gui.properties.TableDbmsTypeProperty;
 import com.speedment.orm.gui.properties.TableEnumProperty;
+import com.speedment.orm.gui.properties.TableNumberProperty;
+import com.speedment.orm.gui.properties.TablePasswordProperty;
 import com.speedment.orm.gui.properties.TableProperty;
+import com.speedment.orm.gui.properties.TablePropertyManager;
 import com.speedment.orm.gui.properties.TablePropertyRow;
 import com.speedment.orm.gui.properties.TableStringProperty;
 import com.speedment.orm.gui.util.FadeAnimation;
@@ -112,6 +117,7 @@ public class SceneController implements Initializable {
 	
 	private final Stage stage;
 	private final Project project;
+	private TablePropertyManager propertyMgr;
 	
 	public SceneController(Stage stage, Project project) {
 		this.stage = stage;
@@ -126,6 +132,8 @@ public class SceneController implements Initializable {
 	 */
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
+		this.propertyMgr = new TablePropertyManager(treeHierarchy);
+		
 		populateTree(project);
 		
 		animateArrow();
@@ -176,7 +184,7 @@ public class SceneController implements Initializable {
 			);
 			
 			populatePropertyTable(
-				propertiesFor(
+				propertyMgr.propertiesFor(
 					l.getList().stream()
 					.map(i -> i.getValue())
 					.collect(Collectors.toList())
@@ -235,155 +243,7 @@ public class SceneController implements Initializable {
 			propertiesContainer.getChildren().add(row);
 		});
 	}
-	
-	private Stream<TableProperty<?>> propertiesFor(List<Child<?>> nodes) {
-		
-		return nodes.stream().flatMap(node -> {
-			System.out.println(node);
-			return MethodsParser.streamOfExternal(node.getClass())
-				.sorted((m0, m1) -> m0.getName().compareTo(m1.getName()))
-				.map(m -> {
-					final String javaName;
-					if (m.getName().startsWith("is")) {
-						javaName = m.getName().substring(2);
-					} else {
-						javaName = m.getName().substring(3);
-					}
-					
-					final String propertyName = JavaLanguage.toHumanReadable(javaName);
-					final External e = MethodsParser.getExternalFor(m, node.getClass());
-					
-					System.out.println(m);
-					
-					Class<?> type = m.getReturnType();
-					Class<?> innerType = e.type();
-					boolean optional = Optional.class.isAssignableFrom(type);
 
-					if (Boolean.class.isAssignableFrom(innerType)) {
-						return createBooleanProperty(propertyName, nodes, 
-							findGetter(node.getClass(), javaName, optional, innerType), 
-							findSetter(node.getClass(), javaName, Boolean.class)
-						);
-					} else if (String.class.isAssignableFrom(innerType)) {
-						return createStringProperty(propertyName, nodes, 
-							findGetter(node.getClass(), javaName, optional, innerType), 
-							findSetter(node.getClass(), javaName, String.class)
-						);
-					} else if (Class.class.isAssignableFrom(innerType)) {
-						return createClassProperty(propertyName, nodes, 
-							findGetter(node.getClass(), javaName, optional, innerType), 
-							findSetter(node.getClass(), javaName, Class.class)
-						);
-					} else if (Enum.class.isAssignableFrom(innerType)) {
-						return createEnumProperty(propertyName, nodes, 
-							findGetter(node.getClass(), javaName, optional, Enum.class), 
-							findSetter(node.getClass(), javaName, (Class<Enum>) innerType),
-							(Enum) type.getEnumConstants()[0]
-						);
-					} else {
-						throw new UnsupportedOperationException("Found method '" + m + "' marked as @External of unsupported type " + type.getName());
-					}
-				});
-		}).distinct().map(tp -> (TableProperty<?>) tp);
-		
-//        return Stream.of(
-//			createProperty("Name", nodes, TableStringProperty::new, n -> n.getName(), (n, v) -> n.setName(v)),
-//			createProperty("Include in generation", nodes, TableBooleanProperty::new, n -> n.isEnabled(), (n, v) -> n.setEnabled(v))
-//		);
-	}
-	
-	private <V> Function<Child<?>, V> findGetter(Class<?> nodeClass, String javaName, boolean optional, Class<?> innerType) {
-		final String methodName;
-		
-		if (Boolean.class.isAssignableFrom(innerType)) {
-			methodName = "is" + javaName;
-		} else {
-			methodName = "get" + javaName;
-		}
-
-		try {
-			final Method method = nodeClass.getMethod(methodName);
-			return c -> {
-				try {
-					if (optional) {
-						return ((Optional<V>) method.invoke(c)).orElse(null);
-					} else {
-						return (V) method.invoke(c);
-					}
-				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-					throw new RuntimeException("Could not invoke method '" + methodName + "' in class '" + nodeClass.getName() + "'.");
-				}
-			};
-		} catch (NoSuchMethodException ex) {
-			throw new RuntimeException("Could not find @External method '" + methodName + "' in class '" + nodeClass.getName() + "'.");
-		}
-	}
-	
-	private <V> BiConsumer<Child<?>, V> findSetter(Class<?> nodeClass, String javaName, Class<V> paramType) {
-		final String methodName = "set" + javaName;
-		
-		try {
-			final Method method = nodeClass.getMethod(methodName, paramType);
-			return (c, v) -> {
-				try {
-					method.invoke(c, v);
-				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-					throw new RuntimeException("Could not invoke method '" + methodName + "' in class '" + nodeClass.getName() + "'.");
-				}
-			};
-		} catch (NoSuchMethodException ex) {
-			throw new RuntimeException("Could not find @External method '" + methodName + "' with param '" + paramType + "' in class '" + nodeClass.getName() + "'.");
-		}
-	}
-	
-	private TableProperty<Boolean> createBooleanProperty(String label, List<Child<?>> nodes, Function<Child<?>, Boolean> selector, BiConsumer<Child<?>, Boolean> updater) {
-		return createProperty(label, nodes, TableBooleanProperty::new, selector, updater);
-	}
-	
-	private TableProperty<String> createStringProperty(String label, List<Child<?>> nodes, Function<Child<?>, String> selector, BiConsumer<Child<?>, String> updater) {
-		return createProperty(label, nodes, TableStringProperty::new, selector, updater);
-	}
-	
-	private TableProperty<Class> createClassProperty(String label, List<Child<?>> nodes, Function<Child<?>, Class> selector, BiConsumer<Child<?>, Class> updater) {
-		return createProperty(label, nodes, TableClassProperty::new, selector, updater);
-	}
-	
-	private <V extends Enum<V>> TableProperty<V> createEnumProperty(String label, List<Child<?>> nodes, Function<Child<?>, V> selector, BiConsumer<Child<?>, V> updater, V defaultValue) {
-		return createProperty(label, nodes, TableEnumProperty::new, selector, updater, defaultValue);
-	}
-	
-	private <V> TableProperty<V> createProperty(String label, List<Child<?>> nodes, BiFunction<String, V, TableProperty<V>> initiator, Function<Child<?>, V> selector, BiConsumer<Child<?>, V> updater) {
-		return createProperty(label, nodes, initiator, selector, updater, null);
-	}
-	
-	private <V> TableProperty<V> createProperty(String label, List<Child<?>> nodes, BiFunction<String, V, TableProperty<V>> initiator, Function<Child<?>, V> selector, BiConsumer<Child<?>, V> updater, V defaultValue) {
-		V option = getOption(nodes, selector);
-		
-		if (option == null) {
-			option = defaultValue;
-		}
-		
-		final TableProperty<V> property = initiator.apply(label, option);
-		
-		property.valueProperty().addListener((ob, o, newValue) -> {
-			System.out.println("Value changed in setting to: " + newValue);
-			treeHierarchy.getSelectionModel().getSelectedItems().stream()
-                .map(i -> i.getValue())
-                .forEach(c -> updater.accept(c, newValue));
-		});
-		
-		return property;
-	}
-	
-	private <V> V getOption(List<Child<?>> nodes, Function<Child<?>, V> selector) {
-		final List<V> variants = nodes.stream().map(n -> selector.apply(n)).distinct().collect(Collectors.toList());
-		if (variants.size() == 1) {
-			return variants.get(0);
-		} else {
-			return null;
-		}
-	}
-	
 	private void animateArrow() {
 		final DropShadow glow = new DropShadow();
 		glow.setBlurType(BlurType.TWO_PASS_BOX);
