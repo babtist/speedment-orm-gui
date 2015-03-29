@@ -148,7 +148,7 @@ public class SceneController implements Initializable {
 			System.out.println("Load project");
 			final FileChooser fileChooser = new FileChooser();
 			fileChooser.setTitle("Open Groovy File");
-			fileChooser.setSelectedExtensionFilter(new ExtensionFilter("Groovy files", "groovy"));
+			fileChooser.setSelectedExtensionFilter(new ExtensionFilter("Groovy files (*.groovy)", "*.groovy"));
 			fileChooser.showOpenDialog(stage);
 			
 			// TODO Do something when project has loaded.
