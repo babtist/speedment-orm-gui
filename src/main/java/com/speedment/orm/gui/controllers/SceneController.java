@@ -221,17 +221,11 @@ public class SceneController implements Initializable {
 
 	private void populatePropertyTable(Stream<TableProperty<?>> properties) {
 		propertiesContainer.getChildren().clear();
-//		System.out.println("******************");
-//		List<TableProperty<?>> props = properties.collect(Collectors.toList());
-//		props.forEach(a -> props.forEach(b -> 
-//			System.out.println("*** " + a.nameProperty() + "(" + a.hashCode() + ") = " + b.nameProperty() + "(" + b.hashCode() + ") -> " + a.equals(b))
-//		));
-//		
+
 		properties.collect(Collectors.toSet()).forEach(p -> {
 			final HBox row = new TablePropertyRow<>(p);
 			propertiesContainer.getChildren().add(row);
 		});
-//		System.out.println("******************");
 	}
 
 	private void animateArrow() {
