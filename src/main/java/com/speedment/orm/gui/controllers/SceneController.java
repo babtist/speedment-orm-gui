@@ -75,233 +75,254 @@ import static javafx.util.Duration.millis;
  */
 public class SceneController implements Initializable {
 
-	@FXML private Button buttonNew;
-	@FXML private Button buttonOpen;
-	@FXML private Button buttonGenerate;
-	@FXML private ImageView logo;
-	@FXML private TreeView<Child<?>> treeHierarchy;
-	@FXML private TableView<String> tableProjectSettings;
-	@FXML private VBox propertiesContainer;
-	@FXML private TextArea output;
-	@FXML private Menu menuFile;
-	@FXML private MenuItem mbNew;
-	@FXML private MenuItem mbOpen;
-	@FXML private MenuItem mbSave;
-	@FXML private MenuItem mbSaveAs;
-	@FXML private MenuItem mbQuit;
-	@FXML private Menu menuEdit;
-	@FXML private MenuItem mbGenerate;
-	@FXML private Menu menuHelp;
-	@FXML private MenuItem mbGitHub;
-	@FXML private MenuItem mbAbout;
-	@FXML private StackPane arrowContainer;
-	@FXML private Label arrow;
-	
-	private final Stage stage;
-	private final Project project;
-	private TablePropertyManager propertyMgr;
-	
-	public SceneController(Stage stage, Project project) {
-		this.stage = stage;
-		this.project = project;
-	}
+    @FXML
+    private Button buttonNew;
+    @FXML
+    private Button buttonOpen;
+    @FXML
+    private Button buttonGenerate;
+    @FXML
+    private ImageView logo;
+    @FXML
+    private TreeView<Child<?>> treeHierarchy;
+    @FXML
+    private TableView<String> tableProjectSettings;
+    @FXML
+    private VBox propertiesContainer;
+    @FXML
+    private TextArea output;
+    @FXML
+    private Menu menuFile;
+    @FXML
+    private MenuItem mbNew;
+    @FXML
+    private MenuItem mbOpen;
+    @FXML
+    private MenuItem mbSave;
+    @FXML
+    private MenuItem mbSaveAs;
+    @FXML
+    private MenuItem mbQuit;
+    @FXML
+    private Menu menuEdit;
+    @FXML
+    private MenuItem mbGenerate;
+    @FXML
+    private Menu menuHelp;
+    @FXML
+    private MenuItem mbGitHub;
+    @FXML
+    private MenuItem mbAbout;
+    @FXML
+    private StackPane arrowContainer;
+    @FXML
+    private Label arrow;
 
-	/**
-	 * Initializes the controller class.
-	 *
-	 * @param url
-	 * @param rb
-	 */
-	@Override
-	public void initialize(URL url, ResourceBundle rb) {
-		this.propertyMgr = new TablePropertyManager(treeHierarchy);
-		
-		populateTree(project);
-		
-		animateArrow();
-		
-		mbNew.setGraphic(Icons.NEW_PROJECT.view());
-		mbOpen.setGraphic(Icons.OPEN_PROJECT.view());
-		mbSave.setGraphic(SilkIcons.DISK.view());
-		mbSaveAs.setGraphic(SilkIcons.DISK_MULTIPLE.view());
-		mbQuit.setGraphic(SilkIcons.DOOR_IN.view());
-		mbGenerate.setGraphic(Icons.RUN_PROJECT.view());
-		mbGitHub.setGraphic(SilkIcons.USER_COMMENT.view());
-		mbAbout.setGraphic(SilkIcons.INFORMATION.view());
-		
-		buttonNew.setGraphic(Icons.NEW_PROJECT_24.view());
-		buttonOpen.setGraphic(Icons.OPEN_PROJECT_24.view());
-		buttonGenerate.setGraphic(Icons.RUN_PROJECT_24.view());
-		
-		// New project.
-		final EventHandler<ActionEvent> newProject = ev -> {
-			System.out.println("Creating new project.");
-			final Stage newStage = new Stage();
-			ProjectPromptController.showIn(newStage);
-		};
-		
-		buttonNew.setOnAction(newProject);
-		mbNew.setOnAction(newProject);
-		
-		// Open project.
-		final EventHandler<ActionEvent> openProject = ev -> {
-			System.out.println("Load project");
-			final FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle("Open Groovy File");
-			fileChooser.setSelectedExtensionFilter(new ExtensionFilter("Groovy files (*.groovy)", "*.groovy"));
-			fileChooser.showOpenDialog(stage);
-			
-			// TODO Do something when project has loaded.
-		};
-		
-		buttonOpen.setOnAction(openProject);
-		mbOpen.setOnAction(openProject);
-		
-		// Save application
-		mbSave.setOnAction(ev -> {
-			// TODO Save application.
-		});
-		
-		// Save application as
-		mbSaveAs.setOnAction(ev -> {
-			// TODO Save application as.
-		});
-		
-		// Generate code
-		final EventHandler<ActionEvent> generate = ev -> {
-			System.out.println("Generate code");
-			// TODO Generate code.
-		};
-		
-		buttonGenerate.setOnAction(generate);
-		mbGenerate.setOnAction(generate);
-		
-		// Quit application
-		mbQuit.setOnAction(ev -> {
-			stage.close();
-		});
-	}
+    private final Stage stage;
+    private final Project project;
+    private TablePropertyManager propertyMgr;
 
-	private void populateTree(Project project) {
-		final ListChangeListener<? super TreeItem<Child<?>>> change = l -> {
+    public SceneController(Stage stage, Project project) {
+        this.stage = stage;
+        this.project = project;
+    }
 
-			System.out.println("Selection changed to: " + 
-				l.getList().stream()
-					.map(i -> i.getValue().getName())
-					.collect(Collectors.joining(", ", "(", ")"))
-			);
-			
-			populatePropertyTable(
-				propertyMgr.propertiesFor(
-					l.getList().stream()
-					.map(i -> i.getValue())
-					.collect(Collectors.toList())
-				)
-			);
-		};
-		
-		treeHierarchy.setCellFactory(v -> new TreeCell<Child<?>>() {
+    /**
+     * Initializes the controller class.
+     *
+     * @param url
+     * @param rb
+     */
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        this.propertyMgr = new TablePropertyManager(treeHierarchy);
 
-			@Override
-			protected void updateItem(Child<?> item, boolean empty) {
-				super.updateItem(item, empty);
-				
-				if (item == null || empty) {
-					setGraphic(null);
-					setText(null);
-				} else {
-					setGraphic(iconFor(item));
-					setText(item.getName());
-				}
-			}
-		});
+        populateTree(project);
 
-		treeHierarchy.getSelectionModel().setSelectionMode(MULTIPLE);
-		treeHierarchy.getSelectionModel().getSelectedItems().addListener(change);
-		treeHierarchy.setRoot(branch(project));
-	}
-	
-	private ImageView iconFor(Node node) {
-		final Icons icon = Icons.forNodeType(node.getInterfaceMainClass());
-		
-		if (icon == null) {
-			throw new RuntimeException("Unknown node type '" + node.getInterfaceMainClass().getName() + "'.");
-		} else {
-			return icon.view();
-		}
-	}
+        animateArrow();
 
-	private TreeItem<Child<?>> branch(Child<?> node) {
-		final TreeItem<Child<?>> branch = new TreeItem<>(node);
-		branch.setExpanded(true);
+        mbNew.setGraphic(Icons.NEW_PROJECT.view());
+        mbOpen.setGraphic(Icons.OPEN_PROJECT.view());
+        mbSave.setGraphic(SilkIcons.DISK.view());
+        mbSaveAs.setGraphic(SilkIcons.DISK_MULTIPLE.view());
+        mbQuit.setGraphic(SilkIcons.DOOR_IN.view());
+        mbGenerate.setGraphic(Icons.RUN_PROJECT.view());
+        mbGitHub.setGraphic(SilkIcons.USER_COMMENT.view());
+        mbAbout.setGraphic(SilkIcons.INFORMATION.view());
 
-		node.asParent().ifPresent(p -> {
-			p.stream().map(c -> branch(c)).forEach(
-				c -> branch.getChildren().add(c)
-			);
-		});
+        buttonNew.setGraphic(Icons.NEW_PROJECT_24.view());
+        buttonOpen.setGraphic(Icons.OPEN_PROJECT_24.view());
+        buttonGenerate.setGraphic(Icons.RUN_PROJECT_24.view());
 
-		return branch;
-	}
+        // New project.
+        final EventHandler<ActionEvent> newProject = ev -> {
+            System.out.println("Creating new project.");
+            final Stage newStage = new Stage();
+            ProjectPromptController.showIn(newStage);
+        };
 
-	private void populatePropertyTable(Stream<TableProperty<?>> properties) {
-		propertiesContainer.getChildren().clear();
+        buttonNew.setOnAction(newProject);
+        mbNew.setOnAction(newProject);
 
-		properties.collect(Collectors.toSet()).forEach(p -> {
-			final HBox row = new TablePropertyRow<>(p);
-			propertiesContainer.getChildren().add(row);
-		});
-	}
+        // Open project.
+        final EventHandler<ActionEvent> openProject = ev -> {
+            System.out.println("Load project");
+            final FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Open Groovy File");
+            fileChooser.setSelectedExtensionFilter(new ExtensionFilter("Groovy files (*.groovy)", "*.groovy"));
+            fileChooser.showOpenDialog(stage);
 
-	private void animateArrow() {
-		final DropShadow glow = new DropShadow();
-		glow.setBlurType(BlurType.TWO_PASS_BOX);
-		glow.setColor(Color.rgb(0, 255, 255, 1.0));
-		glow.setWidth(20);
-		glow.setHeight(20);
-		glow.setRadius(0.0);
-		arrow.setEffect(glow);
+            // TODO Do something when project has loaded.
+        };
 
-		final KeyFrame kf0 = new KeyFrame(ZERO, 
-			new KeyValue(arrow.translateXProperty(), 55, EASE_BOTH),
-			new KeyValue(arrow.translateYProperty(), -15, EASE_BOTH),
-			new KeyValue(glow.radiusProperty(), 32, EASE_BOTH)
-		);
-		
-		final KeyFrame kf1 = new KeyFrame(millis(400), 
-			new KeyValue(arrow.translateXProperty(), 45, EASE_BOTH),
-			new KeyValue(arrow.translateYProperty(), 5, EASE_BOTH),
-			new KeyValue(glow.radiusProperty(), 0, EASE_BOTH)
-		);
-		
-		final Timeline tl = new Timeline(kf0, kf1);
-		tl.setAutoReverse(true);
-		tl.setCycleCount(INDEFINITE);
-		tl.play();
+        buttonOpen.setOnAction(openProject);
+        mbOpen.setOnAction(openProject);
 
-		final EventHandler<MouseEvent> over = ev -> {
-			FadeAnimation.fadeOut(arrow, e -> arrowContainer.getChildren().remove(arrow));
-		};
-		
-		arrow.setOnMouseEntered(over);
-	}
-	
-	public static void showIn(Stage stage, Project project) {
-		final FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/Scene.fxml"));
-		final SceneController control = new SceneController(stage, project);
-		loader.setController(control);
+        // Save application
+        mbSave.setOnAction(ev -> {
+            // TODO Save application.
+        });
 
-		try {
-			final Parent root = (Parent) loader.load();
-			final Scene scene = new Scene(root);
+        // Save application as
+        mbSaveAs.setOnAction(ev -> {
+            // TODO Save application as.
+        });
 
-			stage.hide();
-			stage.setTitle("Speedment ORM");
-			stage.setMaximized(true);
-			stage.setScene(scene);
-			stage.show();
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		}
-	}
+        // Generate code
+        final EventHandler<ActionEvent> generate = ev -> {
+            System.out.println("Generate code");
+            // TODO Generate code.
+        };
+
+        buttonGenerate.setOnAction(generate);
+        mbGenerate.setOnAction(generate);
+
+        // Quit application
+        mbQuit.setOnAction(ev -> {
+            stage.close();
+        });
+    }
+
+    private void populateTree(Project project) {
+        final ListChangeListener<? super TreeItem<Child<?>>> change = l -> {
+
+            System.out.println("Selection changed to: "
+                    + l.getList().stream()
+                    .map(i -> i.getValue().getName())
+                    .collect(Collectors.joining(", ", "(", ")"))
+            );
+
+            populatePropertyTable(
+                    propertyMgr.propertiesFor(
+                            l.getList().stream()
+                            .map(i -> i.getValue())
+                            .collect(Collectors.toList())
+                    )
+            );
+        };
+
+        treeHierarchy.setCellFactory(v -> new TreeCell<Child<?>>() {
+
+            @Override
+            protected void updateItem(Child<?> item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (item == null || empty) {
+                    setGraphic(null);
+                    setText(null);
+                } else {
+                    setGraphic(iconFor(item));
+                    setText(item.getName());
+                }
+            }
+        });
+
+        treeHierarchy.getSelectionModel().setSelectionMode(MULTIPLE);
+        treeHierarchy.getSelectionModel().getSelectedItems().addListener(change);
+        treeHierarchy.setRoot(branch(project));
+    }
+
+    private ImageView iconFor(Node node) {
+        final Icons icon = Icons.forNodeType(node.getInterfaceMainClass());
+
+        if (icon == null) {
+            throw new RuntimeException("Unknown node type '" + node.getInterfaceMainClass().getName() + "'.");
+        } else {
+            return icon.view();
+        }
+    }
+
+    private TreeItem<Child<?>> branch(Child<?> node) {
+        final TreeItem<Child<?>> branch = new TreeItem<>(node);
+        branch.setExpanded(true);
+
+        node.asParent().ifPresent(p -> {
+            p.stream().map(c -> branch(c)).forEach(
+                    c -> branch.getChildren().add(c)
+            );
+        });
+
+        return branch;
+    }
+
+    private void populatePropertyTable(Stream<TableProperty<?>> properties) {
+        propertiesContainer.getChildren().clear();
+
+        properties.collect(Collectors.toSet()).forEach(p -> {
+            final HBox row = new TablePropertyRow<>(p);
+            propertiesContainer.getChildren().add(row);
+        });
+    }
+
+    private void animateArrow() {
+        final DropShadow glow = new DropShadow();
+        glow.setBlurType(BlurType.TWO_PASS_BOX);
+        glow.setColor(Color.rgb(0, 255, 255, 1.0));
+        glow.setWidth(20);
+        glow.setHeight(20);
+        glow.setRadius(0.0);
+        arrow.setEffect(glow);
+
+        final KeyFrame kf0 = new KeyFrame(ZERO,
+                new KeyValue(arrow.translateXProperty(), 55, EASE_BOTH),
+                new KeyValue(arrow.translateYProperty(), -15, EASE_BOTH),
+                new KeyValue(glow.radiusProperty(), 32, EASE_BOTH)
+        );
+
+        final KeyFrame kf1 = new KeyFrame(millis(400),
+                new KeyValue(arrow.translateXProperty(), 45, EASE_BOTH),
+                new KeyValue(arrow.translateYProperty(), 5, EASE_BOTH),
+                new KeyValue(glow.radiusProperty(), 0, EASE_BOTH)
+        );
+
+        final Timeline tl = new Timeline(kf0, kf1);
+        tl.setAutoReverse(true);
+        tl.setCycleCount(INDEFINITE);
+        tl.play();
+
+        final EventHandler<MouseEvent> over = ev -> {
+            FadeAnimation.fadeOut(arrow, e -> arrowContainer.getChildren().remove(arrow));
+        };
+
+        arrow.setOnMouseEntered(over);
+    }
+
+    public static void showIn(Stage stage, Project project) {
+        final FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/Scene.fxml"));
+        final SceneController control = new SceneController(stage, project);
+        loader.setController(control);
+
+        try {
+            final Parent root = (Parent) loader.load();
+            final Scene scene = new Scene(root);
+
+            stage.hide();
+            stage.setTitle("Speedment ORM");
+            stage.setMaximized(true);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 }

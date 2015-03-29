@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.text.*?>
-<?import javafx.geometry.*?>
 <?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
 <HBox fx:id="container" alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="6.0" style="-fx-background-color: #ddd;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
@@ -50,6 +48,7 @@
             <TextField fx:id="fieldUser" promptText="Username" />
             <PasswordField fx:id="fieldPass" promptText="Password" />
             <TextField fx:id="fieldName" promptText="Database name" />
+            <TextField fx:id="fieldSchema" promptText="Schema name" />
             <Button fx:id="buttonConnect" defaultButton="true" disable="true" mnemonicParsing="false" text="Connect">
                <padding>
                   <Insets bottom="8.0" left="16.0" right="16.0" top="8.0" />
