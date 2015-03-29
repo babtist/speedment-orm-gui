@@ -45,17 +45,20 @@ public abstract class TableProperty<V> {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(this.name);
+		if (name == null) {
+			return 0;
+		} else {
+			return Objects.hashCode(name.get());
+		}
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		return Optional.ofNullable(obj)
 			.filter(o -> TableProperty.class.isAssignableFrom(o.getClass()))
-			.map(o -> (TableProperty) o)
-			.filter(tp -> name.equals(tp.name))
+			.map(o -> (TableProperty<?>) o)
+			.filter(tp -> name != null || name == tp.name)
+			.filter(tp -> name.get().equals(tp.name.get()))
 			.isPresent();
 	}
-	
-	
 }

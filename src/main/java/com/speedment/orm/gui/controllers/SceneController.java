@@ -28,6 +28,7 @@ import com.speedment.orm.gui.properties.TablePropertyRow;
 import com.speedment.orm.gui.util.FadeAnimation;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -220,10 +221,17 @@ public class SceneController implements Initializable {
 
 	private void populatePropertyTable(Stream<TableProperty<?>> properties) {
 		propertiesContainer.getChildren().clear();
-		properties.forEach(p -> {
+//		System.out.println("******************");
+//		List<TableProperty<?>> props = properties.collect(Collectors.toList());
+//		props.forEach(a -> props.forEach(b -> 
+//			System.out.println("*** " + a.nameProperty() + "(" + a.hashCode() + ") = " + b.nameProperty() + "(" + b.hashCode() + ") -> " + a.equals(b))
+//		));
+//		
+		properties.collect(Collectors.toSet()).forEach(p -> {
 			final HBox row = new TablePropertyRow<>(p);
 			propertiesContainer.getChildren().add(row);
 		});
+//		System.out.println("******************");
 	}
 
 	private void animateArrow() {

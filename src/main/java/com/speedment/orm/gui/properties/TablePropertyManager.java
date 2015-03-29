@@ -50,8 +50,6 @@ public class TablePropertyManager {
 					final String propertyName = JavaLanguage.toHumanReadable(javaName);
 					final External e = MethodsParser.getExternalFor(m, node.getClass());
 					
-					System.out.println(m);
-					
 					Class<?> type = m.getReturnType();
 					Class<?> innerType = e.type();
 					boolean optional = Optional.class.isAssignableFrom(type);
@@ -98,7 +96,7 @@ public class TablePropertyManager {
 						throw new UnsupportedOperationException("Found method '" + m + "' in '" + node.getClass() + "' marked as @External of unsupported type " + type.getName());
 					}
 				});
-		}).distinct().map(tp -> (TableProperty<?>) tp);
+		}).map(tp -> (TableProperty<?>) tp).distinct();
 
 	}
 	
