@@ -205,7 +205,7 @@ public class TablePropertyManager {
 			System.out.println("Value changed in setting to: " + newValue);
 			tree.getSelectionModel().getSelectedItems().stream()
                 .map(i -> i.getValue())
-                .forEach(c -> updater.accept(c, newValue));
+                .forEachOrdered(c -> updater.accept(c, newValue));
 		});
 		
 		return property;
