@@ -236,7 +236,7 @@ public class SceneController implements Initializable {
 		branch.setExpanded(true);
 
 		node.asParent().ifPresent(p -> {
-			p.stream().map(c -> branch(c)).forEach(
+			p.stream().map(c -> branch(c)).forEachOrdered(
 				c -> branch.getChildren().add(c)
 			);
 		});
@@ -247,7 +247,7 @@ public class SceneController implements Initializable {
 	private void populatePropertyTable(Stream<TableProperty<?>> properties) {
 		propertiesContainer.getChildren().clear();
 
-		properties.forEach(p -> {
+		properties.forEachOrdered(p -> {
 			final HBox row = new TablePropertyRow<>(p);
 			propertiesContainer.getChildren().add(row);
 		});
