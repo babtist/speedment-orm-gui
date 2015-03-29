@@ -152,7 +152,7 @@ public class SceneController implements Initializable {
 			fileChooser.showOpenDialog(stage);
 			
 			// TODO Do something when project has loaded.
-		};
+		}; 
 		
 		buttonOpen.setOnAction(openProject);
 		mbOpen.setOnAction(openProject);
