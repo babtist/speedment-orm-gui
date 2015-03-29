@@ -28,7 +28,6 @@ import com.speedment.orm.gui.properties.TablePropertyRow;
 import com.speedment.orm.gui.util.FadeAnimation;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -151,10 +150,36 @@ public class SceneController implements Initializable {
 			fileChooser.setTitle("Open Groovy File");
 			fileChooser.setSelectedExtensionFilter(new ExtensionFilter("Groovy files", "groovy"));
 			fileChooser.showOpenDialog(stage);
+			
+			// TODO Do something when project has loaded.
 		};
 		
 		buttonOpen.setOnAction(openProject);
 		mbOpen.setOnAction(openProject);
+		
+		// Save application
+		mbSave.setOnAction(ev -> {
+			// TODO Save application.
+		});
+		
+		// Save application as
+		mbSaveAs.setOnAction(ev -> {
+			// TODO Save application as.
+		});
+		
+		// Generate code
+		final EventHandler<ActionEvent> generate = ev -> {
+			System.out.println("Generate code");
+			// TODO Generate code.
+		};
+		
+		buttonGenerate.setOnAction(generate);
+		mbGenerate.setOnAction(generate);
+		
+		// Quit application
+		mbQuit.setOnAction(ev -> {
+			stage.close();
+		});
 	}
 
 	private void populateTree(Project project) {
