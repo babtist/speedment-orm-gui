@@ -38,51 +38,56 @@ import javafx.stage.Stage;
  * @author Emil Forslund
  */
 public class MailPromptController implements Initializable {
-	
-	@FXML private Label labelHeader;
-	@FXML private TextField fieldMail;
-	@FXML private Label labelLicense;
-	@FXML private Button buttonOkey;
-	
-	private final Predicate<String> isInvalidMail = 
-		s -> !s.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
-	
-	private final Stage stage;
-	
-	public MailPromptController(Stage stage) {
-		this.stage = stage;
-	}
 
-	/**
-	 * Initializes the controller class.
-	 * @param url
-	 * @param rb
-	 */
-	@Override
-	public void initialize(URL url, ResourceBundle rb) {
-		fieldMail.textProperty().addListener((ov, o, n) -> {
-			buttonOkey.setDisable(isInvalidMail.test(n));
-		});
-		
-		buttonOkey.setOnAction(ev -> {
-			ProjectPromptController.showIn(stage);
-			Settings.inst().set("user_mail", fieldMail.getText());
-		});
-	}
-	
-	public static void showIn(Stage stage) {
-		final FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/MailPrompt.fxml"));
+    @FXML
+    private Label labelHeader;
+    @FXML
+    private TextField fieldMail;
+    @FXML
+    private Label labelLicense;
+    @FXML
+    private Button buttonOkey;
+
+    private final Predicate<String> isInvalidMail
+            = s -> !s.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
+
+    private final Stage stage;
+
+    public MailPromptController(Stage stage) {
+        this.stage = stage;
+    }
+
+    /**
+     * Initializes the controller class.
+     *
+     * @param url
+     * @param rb
+     */
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        fieldMail.textProperty().addListener((ov, o, n) -> {
+            buttonOkey.setDisable(isInvalidMail.test(n));
+        });
+
+        buttonOkey.setOnAction(ev -> {
+            ProjectPromptController.showIn(stage);
+            Settings.inst().set("user_mail", fieldMail.getText());
+        });
+    }
+
+    public static void showIn(Stage stage) {
+        final FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/MailPrompt.fxml"));
         final MailPromptController control = new MailPromptController(stage);
-		loader.setController(control);
-		
-		try {
-			final VBox root = (VBox) loader.load();
-			final Scene scene = new Scene(root);
+        loader.setController(control);
 
-			stage.setTitle("Please enter your email");
-			stage.setScene(scene);
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		}
-	}
+        try {
+            final VBox root = (VBox) loader.load();
+            final Scene scene = new Scene(root);
+
+            stage.setTitle("Please enter your email");
+            stage.setScene(scene);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 }

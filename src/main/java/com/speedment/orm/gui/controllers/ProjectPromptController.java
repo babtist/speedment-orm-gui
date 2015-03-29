@@ -23,6 +23,7 @@ import com.speedment.orm.config.model.parameters.StandardDbmsType;
 import com.speedment.orm.db.DbmsHandler;
 import com.speedment.orm.gui.MainApp;
 import com.speedment.orm.gui.Settings;
+import static com.speedment.orm.gui.util.ProjectUtil.createOpenProjectHandler;
 import com.speedment.orm.platform.Platform;
 import com.speedment.orm.platform.component.DbmsHandlerComponent;
 import com.speedment.util.Trees;
@@ -32,6 +33,8 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -128,8 +131,8 @@ public class ProjectPromptController implements Initializable {
         buttonConnect.setOnAction(ev -> {
             
             Project project = Project.newProject();
-            project.setName("HelloSpeedment");
-            project.setPacketName("org.speedment.test");
+            project.setName("project_1");
+
             
             Dbms dbms = Dbms.newDbms();
             dbms.setIpAddress(fieldHost.getText());
@@ -193,6 +196,11 @@ public class ProjectPromptController implements Initializable {
             SceneController.showIn(stage, project);
             Settings.inst().set("hide_open_option", false);
         });
+        
+        buttonOpen.setOnAction(createOpenProjectHandler(stage, (f,p) -> {
+            // Todo: set saved file;
+            SceneController.showIn(stage, p);
+        }));
     }
     
     private void toggleConnectButton() {

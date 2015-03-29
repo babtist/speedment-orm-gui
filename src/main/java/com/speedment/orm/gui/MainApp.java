@@ -27,18 +27,28 @@ import javafx.stage.Stage;
  * @author Emil Forslund
  */
 public class MainApp extends Application {
+    
+    private static MainApp app;
 
     @Override
     public void start(Stage stage) throws Exception {
-		stage.getIcons().add(Icons.SPEEDMENT_LOGO.load());
-		
-		if (Settings.inst().has("user_mail")) {
-			ProjectPromptController.showIn(stage);
-		} else {
-			MailPromptController.showIn(stage);
-		}
-		
-		stage.show();
+        app = this;
+        
+        stage.getIcons().add(Icons.SPEEDMENT_LOGO.load());
+
+        if (Settings.inst().has("user_mail")) {
+            ProjectPromptController.showIn(stage);
+        } else {
+            MailPromptController.showIn(stage);
+        }
+
+        stage.show();
+        
+        
+    }
+    
+    public static void showWebsite(String url) {
+        app.getHostServices().showDocument(url);
     }
 
     /**

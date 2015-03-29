@@ -16,18 +16,25 @@
  */
 package com.speedment.orm.gui.controllers;
 
+import com.speedment.orm.code.model.java.MainGenerator;
 import com.speedment.orm.config.model.Project;
 import com.speedment.orm.config.model.aspects.Child;
 import com.speedment.orm.config.model.aspects.Node;
 import com.speedment.orm.gui.MainApp;
+import static com.speedment.orm.gui.MainApp.showWebsite;
 import com.speedment.orm.gui.icons.Icons;
 import com.speedment.orm.gui.icons.SilkIcons;
 import com.speedment.orm.gui.properties.TableProperty;
 import com.speedment.orm.gui.properties.TablePropertyManager;
 import com.speedment.orm.gui.properties.TablePropertyRow;
 import com.speedment.orm.gui.util.FadeAnimation;
+import static com.speedment.orm.gui.util.ProjectUtil.createOpenProjectHandler;
+import static com.speedment.orm.gui.util.ProjectUtil.createSaveAsProjectHandler;
+import static com.speedment.orm.gui.util.ProjectUtil.createSaveProjectHandler;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.time.Instant;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -44,7 +51,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -62,8 +71,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import static javafx.util.Duration.ZERO;
 import static javafx.util.Duration.millis;
@@ -118,8 +125,9 @@ public class SceneController implements Initializable {
     @FXML
     private Label arrow;
 
+    private File savedFile;
     private final Stage stage;
-    private final Project project;
+    private Project project;
     private TablePropertyManager propertyMgr;
 
     public SceneController(Stage stage, Project project) {
@@ -156,7 +164,7 @@ public class SceneController implements Initializable {
 
         // New project.
         final EventHandler<ActionEvent> newProject = ev -> {
-            System.out.println("Creating new project.");
+            printLines("Creating new project.");
             final Stage newStage = new Stage();
             ProjectPromptController.showIn(newStage);
         };
@@ -165,33 +173,68 @@ public class SceneController implements Initializable {
         mbNew.setOnAction(newProject);
 
         // Open project.
-        final EventHandler<ActionEvent> openProject = ev -> {
-            System.out.println("Load project");
-            final FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Open Groovy File");
-            fileChooser.setSelectedExtensionFilter(new ExtensionFilter("Groovy files (*.groovy)", "*.groovy"));
-            fileChooser.showOpenDialog(stage);
-
-            // TODO Do something when project has loaded.
-        };
+//        final EventHandler<ActionEvent> openProject = ev -> {
+//            System.out.println("Load project");
+//            final FileChooser fileChooser = new FileChooser();
+//            fileChooser.setTitle("Open Groovy File");
+//            fileChooser.setSelectedExtensionFilter(new ExtensionFilter("Groovy files (*.groovy)", "*.groovy"));
+//            File file = fileChooser.showOpenDialog(stage);
+//
+//            try {
+//                final Project p = Project.newProject();
+//                GroovyParser.fromGroovy(p, file.toPath());
+//                treeHierarchy.setRoot(branch(p));
+//                project = p;
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                final Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.OK);
+//                alert.showAndWait();
+//            }
+//
+//        };
+        final EventHandler<ActionEvent> openProject = createOpenProjectHandler(stage, (f, p) -> {
+            savedFile = f;
+            treeHierarchy.setRoot(branch(p));
+            project = p;
+            printLines("Opened config file: " + savedFile);
+        });
 
         buttonOpen.setOnAction(openProject);
         mbOpen.setOnAction(openProject);
 
         // Save application
-        mbSave.setOnAction(ev -> {
-            // TODO Save application.
-        });
+        mbSave.setOnAction(createSaveProjectHandler(this, f -> {
+            savedFile = f;
+            printLines("Saved config file: " + savedFile);
+        }));
 
         // Save application as
-        mbSaveAs.setOnAction(ev -> {
-            // TODO Save application as.
-        });
+        mbSaveAs.setOnAction(createSaveAsProjectHandler(this, f -> {
+            savedFile = f;
+            printLines("Saved config file: " + savedFile);
+        }));
+
+        // Help
+        mbGitHub.setOnAction(ev -> showWebsite("https://github.com/speedment/speedment-orm"));
+        logo.setOnMousePressed(ev -> showWebsite("https://github.com/speedment/speedment-orm"));
 
         // Generate code
         final EventHandler<ActionEvent> generate = ev -> {
-            System.out.println("Generate code");
-            // TODO Generate code.
+            printLines("Generating started to: " + project.getPacketLocation());
+
+            try {
+                final MainGenerator instance = new MainGenerator();
+                instance.accept(project);
+                printLines("Generation completed!");
+//                final Alert alert = new Alert(Alert.AlertType.INFORMATION, "Your code has been generated at location\n " + project.getPacketLocation(), ButtonType.OK);
+//                alert.setResizable(true);
+//                alert.showAndWait();
+            } catch (Exception e) {
+                e.printStackTrace();
+                final Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.OK);
+                alert.showAndWait();
+            }
         };
 
         buttonGenerate.setOnAction(generate);
@@ -201,6 +244,24 @@ public class SceneController implements Initializable {
         mbQuit.setOnAction(ev -> {
             stage.close();
         });
+    }
+    
+    public Stage getStage() {
+        return stage;
+    }
+    
+    public Project getProject() {
+        return project;
+    }
+    
+    public File getLastSaved() {
+        return savedFile;
+    }
+    
+    public void printLines(String... row) {
+        output.appendText(Stream.of(row)
+            .map(s -> Instant.now() + ": " + s)
+            .collect(Collectors.joining("\n")) + "\n");
     }
 
     private void populateTree(Project project) {
