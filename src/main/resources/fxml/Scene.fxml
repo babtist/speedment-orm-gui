@@ -163,7 +163,7 @@
             </MenuBar>
          </top>
       </BorderPane>
-      <Label fx:id="arrow" rotate="290.0" text="➙" textFill="#48adffb2" translateX="45.0" translateY="5.0" StackPane.alignment="TOP_LEFT">
+      <Label fx:id="arrow" rotate="290.0" text="➙" textFill="#48adffb2" translateX="80.0" translateY="5.0" StackPane.alignment="TOP_LEFT">
          <font>
             <Font size="150.0" />
          </font>
