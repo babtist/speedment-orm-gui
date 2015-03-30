@@ -221,15 +221,13 @@ public class SceneController implements Initializable {
 
         // Generate code
         final EventHandler<ActionEvent> generate = ev -> {
-            printLines("Generating started to: " + project.getPacketLocation());
+            printLines("Generating classes " + project.getPacketName() + "." + project.getName() + ".*");
+            printLines("Target directory is " + project.getPacketLocation());
 
             try {
                 final MainGenerator instance = new MainGenerator();
                 instance.accept(project);
                 printLines("Generation completed!");
-//                final Alert alert = new Alert(Alert.AlertType.INFORMATION, "Your code has been generated at location\n " + project.getPacketLocation(), ButtonType.OK);
-//                alert.setResizable(true);
-//                alert.showAndWait();
             } catch (Exception e) {
                 e.printStackTrace();
                 final Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.OK);
@@ -245,23 +243,23 @@ public class SceneController implements Initializable {
             stage.close();
         });
     }
-    
+
     public Stage getStage() {
         return stage;
     }
-    
+
     public Project getProject() {
         return project;
     }
-    
+
     public File getLastSaved() {
         return savedFile;
     }
-    
+
     public void printLines(String... row) {
         output.appendText(Stream.of(row)
-            .map(s -> Instant.now() + ": " + s)
-            .collect(Collectors.joining("\n")) + "\n");
+                .map(s -> Instant.now() + ": " + s)
+                .collect(Collectors.joining("\n")) + "\n");
     }
 
     private void populateTree(Project project) {
