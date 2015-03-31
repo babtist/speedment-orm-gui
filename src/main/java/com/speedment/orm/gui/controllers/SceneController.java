@@ -343,13 +343,17 @@ public class SceneController implements Initializable {
         arrow.setEffect(glow);
 
         final KeyFrame kf0 = new KeyFrame(ZERO,
-                new KeyValue(arrow.translateXProperty(), 55, EASE_BOTH),
+//                new KeyValue(arrow.translateXProperty(), 55, EASE_BOTH),
+//                new KeyValue(arrow.translateYProperty(), -15, EASE_BOTH),
+                new KeyValue(arrow.translateXProperty(), 145, EASE_BOTH),
                 new KeyValue(arrow.translateYProperty(), -15, EASE_BOTH),
                 new KeyValue(glow.radiusProperty(), 32, EASE_BOTH)
         );
 
         final KeyFrame kf1 = new KeyFrame(millis(400),
-                new KeyValue(arrow.translateXProperty(), 45, EASE_BOTH),
+//                new KeyValue(arrow.translateXProperty(), 45, EASE_BOTH),
+//                new KeyValue(arrow.translateYProperty(), 5, EASE_BOTH),
+				new KeyValue(arrow.translateXProperty(), 135, EASE_BOTH),
                 new KeyValue(arrow.translateYProperty(), 5, EASE_BOTH),
                 new KeyValue(glow.radiusProperty(), 0, EASE_BOTH)
         );
