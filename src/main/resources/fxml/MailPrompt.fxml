@@ -14,7 +14,8 @@
             <Font name="Arial Bold" size="24.0" />
          </font>
       </Label>
-      <TextField fx:id="fieldMail" promptText="Enter your mail-address!">
+      <Label maxWidth="1.7976931348623157E308" text="Please enter your email adress:" />
+      <TextField fx:id="fieldMail" promptText="Email">
          <padding>
             <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
          </padding>
